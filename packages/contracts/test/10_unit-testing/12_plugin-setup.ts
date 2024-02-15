@@ -1,107 +1,167 @@
-import {PLUGIN_SETUP_CONTRACT_NAME} from '../../plugin-settings';
-import buildMetadata from '../../src/build-metadata.json';
+import metadata from '../../../../src/plugins/governance/admin/build-metadata.json';
 import {
-  DAOMock,
-  DAOMock__factory,
-  MyPluginSetup,
-  MyPluginSetup__factory,
-  MyPlugin__factory,
-} from '../../typechain';
-import {STORE_PERMISSION_ID, defaultInitData} from './11_plugin';
+  AdminSetup,
+  AdminSetup__factory,
+  Admin__factory,
+} from '../../../../typechain';
+import {deployNewDAO} from '../../../test-utils/dao';
 import {
-  ADDRESS,
-  Operation,
-  PERMISSION_MANAGER_FLAGS,
-  getNamedTypesFromMetadata,
-} from '@aragon/osx-commons-sdk';
-import {loadFixture} from '@nomicfoundation/hardhat-network-helpers';
-import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers';
+  ADMIN_INTERFACE,
+  EXECUTE_PROPOSAL_PERMISSION_ID,
+} from './admin-constants';
+import {Operation} from '@aragon/osx-commons-sdk';
+import {DAO_PERMISSIONS} from '@aragon/osx-commons-sdk';
+import {getNamedTypesFromMetadata} from '@aragon/osx-commons-sdk';
+import {getInterfaceId} from '@aragon/osx-commons-sdk';
 import {expect} from 'chai';
 import {ethers} from 'hardhat';
 
-type FixtureResult = {
-  deployer: SignerWithAddress;
-  alice: SignerWithAddress;
-  bob: SignerWithAddress;
-  pluginSetup: MyPluginSetup;
-  daoMock: DAOMock;
-};
+const abiCoder = ethers.utils.defaultAbiCoder;
+const AddressZero = ethers.constants.AddressZero;
+const EMPTY_DATA = '0x';
 
-async function fixture(): Promise<FixtureResult> {
-  const [deployer, alice, bob] = await ethers.getSigners();
-  const daoMock = await new DAOMock__factory(deployer).deploy();
-  const pluginSetup = await new MyPluginSetup__factory(deployer).deploy();
+describe('AdminSetup', function () {
+  let ownerAddress: string;
+  let signers: any;
+  let adminSetup: AdminSetup;
+  let implementationAddress: string;
+  let targetDao: any;
+  let minimum_data: any;
 
-  return {deployer, alice, bob, pluginSetup, daoMock};
-}
+  before(async () => {
+    signers = await ethers.getSigners();
+    ownerAddress = await signers[0].getAddress();
+    targetDao = await deployNewDAO(signers[0]);
 
-describe(PLUGIN_SETUP_CONTRACT_NAME, function () {
+    minimum_data = abiCoder.encode(
+      getNamedTypesFromMetadata(
+        metadata.pluginSetup.prepareInstallation.inputs
+      ),
+      [ownerAddress]
+    );
+
+    const AdminSetup = new AdminSetup__factory(signers[0]);
+    adminSetup = await AdminSetup.deploy();
+
+    implementationAddress = await adminSetup.implementation();
+  });
+
+  it('does not support the empty interface', async () => {
+    expect(await adminSetup.supportsInterface('0xffffffff')).to.be.false;
+  });
+
+  it('creates admin address base with the correct interface', async () => {
+    const factory = new Admin__factory(signers[0]);
+    const adminAddressContract = factory.attach(implementationAddress);
+
+    expect(
+      await adminAddressContract.supportsInterface(
+        getInterfaceId(ADMIN_INTERFACE)
+      )
+    ).to.be.eq(true);
+  });
+
   describe('prepareInstallation', async () => {
-    let initData: string;
+    it('fails if data is empty, or not of minimum length', async () => {
+      await expect(
+        adminSetup.prepareInstallation(targetDao.address, EMPTY_DATA)
+      ).to.be.reverted;
 
-    before(async () => {
-      initData = ethers.utils.defaultAbiCoder.encode(
-        getNamedTypesFromMetadata(
-          buildMetadata.pluginSetup.prepareInstallation.inputs
-        ),
-        [defaultInitData.number]
-      );
+      await expect(
+        adminSetup.prepareInstallation(
+          targetDao.address,
+          minimum_data.substring(0, minimum_data.length - 2)
+        )
+      ).to.be.reverted;
+
+      await expect(
+        adminSetup.prepareInstallation(targetDao.address, minimum_data)
+      ).not.to.be.reverted;
     });
 
-    it('returns the plugin, helpers, and permissions', async () => {
-      const {deployer, pluginSetup, daoMock} = await loadFixture(fixture);
+    it('reverts if encoded address in `_data` is zero', async () => {
+      const dataWithAddressZero = abiCoder.encode(
+        getNamedTypesFromMetadata(
+          metadata.pluginSetup.prepareInstallation.inputs
+        ),
+        [AddressZero]
+      );
 
+      await expect(
+        adminSetup.prepareInstallation(targetDao.address, dataWithAddressZero)
+      )
+        .to.be.revertedWithCustomError(adminSetup, 'AdminAddressInvalid')
+        .withArgs(AddressZero);
+    });
+
+    it('correctly returns plugin, helpers and permissions', async () => {
       const nonce = await ethers.provider.getTransactionCount(
-        pluginSetup.address
+        adminSetup.address
       );
       const anticipatedPluginAddress = ethers.utils.getContractAddress({
-        from: pluginSetup.address,
+        from: adminSetup.address,
         nonce,
       });
 
       const {
         plugin,
         preparedSetupData: {helpers, permissions},
-      } = await pluginSetup.callStatic.prepareInstallation(
-        daoMock.address,
-        initData
+      } = await adminSetup.callStatic.prepareInstallation(
+        targetDao.address,
+        minimum_data
       );
 
       expect(plugin).to.be.equal(anticipatedPluginAddress);
       expect(helpers.length).to.be.equal(0);
-      expect(permissions.length).to.be.equal(1);
+      expect(permissions.length).to.be.equal(2);
       expect(permissions).to.deep.equal([
         [
           Operation.Grant,
           plugin,
-          daoMock.address,
-          PERMISSION_MANAGER_FLAGS.NO_CONDITION,
-          STORE_PERMISSION_ID,
+          ownerAddress,
+          AddressZero,
+          EXECUTE_PROPOSAL_PERMISSION_ID,
+        ],
+        [
+          Operation.Grant,
+          targetDao.address,
+          plugin,
+          AddressZero,
+          DAO_PERMISSIONS.EXECUTE_PERMISSION_ID,
         ],
       ]);
+    });
 
-      await pluginSetup.prepareInstallation(daoMock.address, initData);
-      const myPlugin = new MyPlugin__factory(deployer).attach(plugin);
+    it('correctly sets up the plugin', async () => {
+      const daoAddress = targetDao.address;
 
-      // initialization is correct
-      expect(await myPlugin.dao()).to.eq(daoMock.address);
-      expect(await myPlugin.number()).to.be.eq(defaultInitData.number);
+      const nonce = await ethers.provider.getTransactionCount(
+        adminSetup.address
+      );
+      const anticipatedPluginAddress = ethers.utils.getContractAddress({
+        from: adminSetup.address,
+        nonce,
+      });
+
+      await adminSetup.prepareInstallation(daoAddress, minimum_data);
+
+      const factory = new Admin__factory(signers[0]);
+      const adminAddressContract = factory.attach(anticipatedPluginAddress);
+
+      expect(await adminAddressContract.dao()).to.be.equal(daoAddress);
     });
   });
 
   describe('prepareUninstallation', async () => {
-    it('returns the permissions', async () => {
-      const {pluginSetup, daoMock} = await loadFixture(fixture);
+    it('correctly returns permissions', async () => {
+      const plugin = ethers.Wallet.createRandom().address;
 
-      const dummyAddr = ADDRESS.ZERO;
-      const emptyData = '0x';
-
-      const permissions = await pluginSetup.callStatic.prepareUninstallation(
-        daoMock.address,
+      const permissions = await adminSetup.callStatic.prepareUninstallation(
+        targetDao.address,
         {
-          plugin: dummyAddr,
+          plugin,
           currentHelpers: [],
-          data: emptyData,
+          data: EMPTY_DATA,
         }
       );
 
@@ -109,10 +169,10 @@ describe(PLUGIN_SETUP_CONTRACT_NAME, function () {
       expect(permissions).to.deep.equal([
         [
           Operation.Revoke,
-          dummyAddr,
-          daoMock.address,
-          PERMISSION_MANAGER_FLAGS.NO_CONDITION,
-          STORE_PERMISSION_ID,
+          targetDao.address,
+          plugin,
+          AddressZero,
+          DAO_PERMISSIONS.EXECUTE_PERMISSION_ID,
         ],
       ]);
     });
