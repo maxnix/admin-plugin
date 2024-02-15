@@ -2,76 +2,99 @@
 
 pragma solidity ^0.8.8;
 
-import {PermissionLib} from "@aragon/osx-commons-contracts/src/permission/PermissionLib.sol";
-import {ProxyLib} from "@aragon/osx-commons-contracts/src/utils/deployment/ProxyLib.sol";
-import {PluginUpgradeableSetup} from "@aragon/osx-commons-contracts/src/plugin/setup/PluginUpgradeableSetup.sol";
+import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
+
 import {IPluginSetup} from "@aragon/osx-commons-contracts/src/plugin/setup/IPluginSetup.sol";
+import {PluginSetup} from "@aragon/osx-commons-contracts/src/plugin/setup/PluginSetup.sol";
 import {IDAO} from "@aragon/osx-commons-contracts/src/dao/IDAO.sol";
 
-import {MyPlugin} from "./MyPlugin.sol";
+import {DAO} from "../../../core/dao/DAO.sol";
+import {PermissionLib} from "@aragon/osx-commons-contracts/src/permission/PermissionLib.sol";
+import {Admin} from "./Admin.sol";
 
-/// @title MyPluginSetup
-/// @dev Release 1, Build 1
-contract MyPluginSetup is PluginUpgradeableSetup {
-    using ProxyLib for address;
+/// @title AdminAddressSetup
+/// @author Aragon Association - 2022-2023
+/// @notice The setup contract of the `Admin` plugin.
+/// @dev v1.1 (Release 1, Build 1)
+/// @custom:security-contact sirt@aragon.org
+contract AdminSetup is PluginSetup {
+    using Clones for address;
 
-    /// @notice Constructs the `PluginUpgradeableSetup` by storing the `MyPlugin` implementation address.
-    /// @dev The implementation address is used to deploy UUPS proxies referencing it and
-    /// to verify the plugin on the respective block explorers.
-    constructor() PluginUpgradeableSetup(address(new MyPlugin())) {}
+    /// @notice The address of the `Admin` plugin logic contract to be cloned.
+    address private immutable implementation_;
 
-    /// @notice The ID of the permission required to call the `storeNumber` function.
-    bytes32 internal constant STORE_PERMISSION_ID = keccak256("STORE_PERMISSION");
+    /// @notice Thrown if the admin address is zero.
+    /// @param admin The admin address.
+    error AdminAddressInvalid(address admin);
+
+    /// @notice The constructor setting the `Admin` implementation contract to clone from.
+    constructor() {
+        implementation_ = address(new Admin());
+    }
 
     /// @inheritdoc IPluginSetup
     function prepareInstallation(
         address _dao,
-        bytes memory _data
+        bytes calldata _data
     ) external returns (address plugin, PreparedSetupData memory preparedSetupData) {
-        uint256 number = abi.decode(_data, (uint256));
+        // Decode `_data` to extract the params needed for cloning and initializing the `Admin` plugin.
+        address admin = abi.decode(_data, (address));
 
-        plugin = IMPLEMENTATION.deployUUPSProxy(
-            abi.encodeCall(MyPlugin.initialize, (IDAO(_dao), number))
-        );
+        if (admin == address(0)) {
+            revert AdminAddressInvalid({admin: admin});
+        }
 
+        // Clone plugin contract.
+        plugin = implementation_.clone();
+
+        // Initialize cloned plugin contract.
+        Admin(plugin).initialize(IDAO(_dao));
+
+        // Prepare permissions
         PermissionLib.MultiTargetPermission[]
-            memory permissions = new PermissionLib.MultiTargetPermission[](1);
+            memory permissions = new PermissionLib.MultiTargetPermission[](2);
 
+        // Grant `ADMIN_EXECUTE_PERMISSION` of the plugin to the admin.
         permissions[0] = PermissionLib.MultiTargetPermission({
             operation: PermissionLib.Operation.Grant,
             where: plugin,
-            who: _dao,
+            who: admin,
             condition: PermissionLib.NO_CONDITION,
-            permissionId: STORE_PERMISSION_ID
+            permissionId: Admin(plugin).EXECUTE_PROPOSAL_PERMISSION_ID()
+        });
+
+        // Grant `EXECUTE_PERMISSION` on the DAO to the plugin.
+        permissions[1] = PermissionLib.MultiTargetPermission({
+            operation: PermissionLib.Operation.Grant,
+            where: _dao,
+            who: plugin,
+            condition: PermissionLib.NO_CONDITION,
+            permissionId: DAO(payable(_dao)).EXECUTE_PERMISSION_ID()
         });
 
         preparedSetupData.permissions = permissions;
     }
 
     /// @inheritdoc IPluginSetup
-    /// @dev The default implementation for the initial build 1 that reverts because no earlier build exists.
-    function prepareUpdate(
-        address _dao,
-        uint16 _fromBuild,
-        SetupPayload calldata _payload
-    ) external pure virtual returns (bytes memory, PreparedSetupData memory) {
-        (_dao, _fromBuild, _payload);
-        revert InvalidUpdatePath({fromBuild: 0, thisBuild: 1});
-    }
-
-    /// @inheritdoc IPluginSetup
+    /// @dev Currently, there is no reliable way to revoke the `ADMIN_EXECUTE_PERMISSION_ID` from all addresses it has been granted to. Accordingly, only the `EXECUTE_PERMISSION_ID` is revoked for this uninstallation.
     function prepareUninstallation(
         address _dao,
         SetupPayload calldata _payload
-    ) external pure returns (PermissionLib.MultiTargetPermission[] memory permissions) {
+    ) external view returns (PermissionLib.MultiTargetPermission[] memory permissions) {
+        // Prepare permissions
         permissions = new PermissionLib.MultiTargetPermission[](1);
 
         permissions[0] = PermissionLib.MultiTargetPermission({
             operation: PermissionLib.Operation.Revoke,
-            where: _payload.plugin,
-            who: _dao,
+            where: _dao,
+            who: _payload.plugin,
             condition: PermissionLib.NO_CONDITION,
-            permissionId: STORE_PERMISSION_ID
+            permissionId: DAO(payable(_dao)).EXECUTE_PERMISSION_ID()
         });
+    }
+
+    /// @inheritdoc IPluginSetup
+    function implementation() external view returns (address) {
+        return implementation_;
     }
 }
