@@ -80,7 +80,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 };
 
 export default func;
-func.tags = ['CreateRepo'];
+func.tags = ['TransferOwnershipToManagmentDao'];
 
 /**
  * Skips the transfer of ownership if it has already been transferred to the management DAO

@@ -96,7 +96,7 @@ type FixtureResult = {
 
 async function fixture(): Promise<FixtureResult> {
   // Deploy all
-  const tags = ['CreateRepo', 'NewVersion'];
+  const tags = ['CreateRepo', 'NewVersion', 'TransferOwnershipToManagmentDao'];
 
   await deployments.fixture(tags);
   const [deployer] = await ethers.getSigners();
