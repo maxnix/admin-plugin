@@ -69,7 +69,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   // Re-initialization will happen through a call to `function initializeFrom(uint8[3] calldata _previousProtocolVersion, bytes calldata _initData)`
   // that Aragon might add to the `PluginRepo` contract once it's required.
   /*
-  // Define the `initData` arguments that 
+  // Define the `_initData` arguments 
   const initData: BytesLike[] = [];
   // Encode the call to `function initializeFrom(uint8[3] calldata _previousProtocolVersion, bytes calldata _initData)` with `initData`
   const initializeFromCalldata =

@@ -18,8 +18,48 @@ import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers';
 import {expect} from 'chai';
 import {ethers} from 'hardhat';
 
-const abiCoder = ethers.utils.defaultAbiCoder;
-const AddressZero = ethers.constants.AddressZero;
+type FixtureResult = {
+  deployer: SignerWithAddress;
+  alice: SignerWithAddress;
+  bob: SignerWithAddress;
+  pluginSetup: AdminSetup;
+  prepareInstallationInputs: string;
+  prepareUninstallationInputs: string;
+  dao: DAO;
+};
+
+async function fixture(): Promise<FixtureResult> {
+  const [deployer, alice, bob] = await ethers.getSigners();
+
+  const dummyMetadata = ethers.utils.hexlify(
+    ethers.utils.toUtf8Bytes('0x123456789')
+  );
+  const dao = await createDaoProxy(deployer, dummyMetadata);
+  const pluginSetup = await new AdminSetup__factory(deployer).deploy();
+
+  const prepareInstallationInputs = ethers.utils.defaultAbiCoder.encode(
+    getNamedTypesFromMetadata(
+      buildMetadata.pluginSetup.prepareInstallation.inputs
+    ),
+    [alice.address]
+  );
+  const prepareUninstallationInputs = ethers.utils.defaultAbiCoder.encode(
+    getNamedTypesFromMetadata(
+      buildMetadata.pluginSetup.prepareUninstallation.inputs
+    ),
+    []
+  );
+
+  return {
+    deployer,
+    alice,
+    bob,
+    pluginSetup,
+    prepareInstallationInputs,
+    prepareUninstallationInputs,
+    dao,
+  };
+}
 
 describe(PLUGIN_SETUP_CONTRACT_NAME, function () {
   it('does not support the empty interface', async () => {
@@ -63,18 +103,18 @@ describe(PLUGIN_SETUP_CONTRACT_NAME, function () {
     it('reverts if encoded address in `_data` is zero', async () => {
       const {pluginSetup, dao} = await loadFixture(fixture);
 
-      const dataWithAddressZero = abiCoder.encode(
+      const dataWithAddressZero = ethers.utils.defaultAbiCoder.encode(
         getNamedTypesFromMetadata(
           buildMetadata.pluginSetup.prepareInstallation.inputs
         ),
-        [AddressZero]
+        [ethers.constants.AddressZero]
       );
 
       await expect(
         pluginSetup.prepareInstallation(dao.address, dataWithAddressZero)
       )
         .to.be.revertedWithCustomError(pluginSetup, 'AdminAddressInvalid')
-        .withArgs(AddressZero);
+        .withArgs(ethers.constants.AddressZero);
     });
 
     it('returns the plugin, helpers and permissions', async () => {
@@ -105,14 +145,14 @@ describe(PLUGIN_SETUP_CONTRACT_NAME, function () {
           Operation.Grant,
           plugin,
           alice.address,
-          AddressZero,
+          ethers.constants.AddressZero,
           EXECUTE_PROPOSAL_PERMISSION_ID,
         ],
         [
           Operation.Grant,
           dao.address,
           plugin,
-          AddressZero,
+          ethers.constants.AddressZero,
           DAO_PERMISSIONS.EXECUTE_PERMISSION_ID,
         ],
       ]);
@@ -168,53 +208,10 @@ describe(PLUGIN_SETUP_CONTRACT_NAME, function () {
           Operation.Revoke,
           dao.address,
           plugin,
-          AddressZero,
+          ethers.constants.AddressZero,
           DAO_PERMISSIONS.EXECUTE_PERMISSION_ID,
         ],
       ]);
     });
   });
 });
-
-type FixtureResult = {
-  deployer: SignerWithAddress;
-  alice: SignerWithAddress;
-  bob: SignerWithAddress;
-  pluginSetup: AdminSetup;
-  prepareInstallationInputs: string;
-  prepareUninstallationInputs: string;
-  dao: DAO;
-};
-
-async function fixture(): Promise<FixtureResult> {
-  const [deployer, alice, bob] = await ethers.getSigners();
-
-  const dummyMetadata = ethers.utils.hexlify(
-    ethers.utils.toUtf8Bytes('0x123456789')
-  );
-  const dao = await createDaoProxy(deployer, dummyMetadata);
-  const pluginSetup = await new AdminSetup__factory(deployer).deploy();
-
-  const prepareInstallationInputs = ethers.utils.defaultAbiCoder.encode(
-    getNamedTypesFromMetadata(
-      buildMetadata.pluginSetup.prepareInstallation.inputs
-    ),
-    [alice.address]
-  );
-  const prepareUninstallationInputs = ethers.utils.defaultAbiCoder.encode(
-    getNamedTypesFromMetadata(
-      buildMetadata.pluginSetup.prepareUninstallation.inputs
-    ),
-    []
-  );
-
-  return {
-    deployer,
-    alice,
-    bob,
-    pluginSetup,
-    prepareInstallationInputs,
-    prepareUninstallationInputs,
-    dao,
-  };
-}

@@ -52,7 +52,7 @@ describe(`PluginSetup processing on network '${productionNetworkName}'`, functio
       .connect(deployer)
       .grant(dao.address, psp.address, DAO_PERMISSIONS.ROOT_PERMISSION_ID);
 
-    // Install build 1.
+    // Install the current build.
     const results = await installPLugin(
       deployer,
       psp,
@@ -74,7 +74,7 @@ describe(`PluginSetup processing on network '${productionNetworkName}'`, functio
     // Check that the setup worked
     expect(await plugin.isMember(alice.address)).to.be.true;
 
-    // Uninstall build 1.
+    // Uninstall the current build.
     await uninstallPLugin(
       deployer,
       psp,
