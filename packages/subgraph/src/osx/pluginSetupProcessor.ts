@@ -1,6 +1,6 @@
 import {InstallationPrepared} from '../../generated/PluginSetupProcessor/PluginSetupProcessor';
-import {DaoPlugin} from '../../generated/schema';
-import {Plugin as PluginTemplate} from '../../generated/templates';
+import {AdminPlugin} from '../../generated/schema';
+import {Admin as PluginTemplate} from '../../generated/templates';
 import {PLUGIN_REPO_ADDRESS} from '../../imported/repo-address';
 import {generatePluginInstallationEntityId} from '@aragon/osx-commons-subgraph';
 import {Address, DataSourceContext, log} from '@graphprotocol/graph-ts';
@@ -30,9 +30,9 @@ export function handleInstallationPrepared(event: InstallationPrepared): void {
     return;
   }
   // Load or create a new entry for the this plugin using the generated installation ID.
-  let pluginEntity = DaoPlugin.load(installationId!);
+  let pluginEntity = AdminPlugin.load(installationId!);
   if (!pluginEntity) {
-    pluginEntity = new DaoPlugin(installationId!);
+    pluginEntity = new AdminPlugin(installationId!);
   }
 
   // Set the DAO and plugin address for the plugin entity.

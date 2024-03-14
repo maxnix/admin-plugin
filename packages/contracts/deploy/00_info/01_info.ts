@@ -31,12 +31,14 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     if (networkConfig === null) {
       throw new UnsupportedNetworkError(productionNetworkName);
     }
+    const rpcUrl =
+      'https://sepolia.infura.io/v3/8bda5eb924b84fd7b685fdd41016011b';
     await hre.network.provider.request({
       method: 'hardhat_reset',
       params: [
         {
           forking: {
-            jsonRpcUrl: networkConfig.url,
+            jsonRpcUrl: rpcUrl,
           },
         },
       ],

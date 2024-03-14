@@ -1,10 +1,72 @@
-# Types
-type DaoPlugin @entity {
-  "OSX related data"
-  id: ID! # psp installationId
+interface IPlugin {
+  id: ID! # PluginInstallationEntityId
+  dao: Bytes!
+  pluginAddress: Bytes!
+}
+
+type AdminPlugin implements IPlugin @entity {
+  "TODO: attributes should be appended to Plugin once plugin is separated from Aragon OSx"
+  id: ID!
   dao: Bytes!
   pluginAddress: Bytes!
 
-  "Set plugin specific related data below:"
-  number: BigInt
+  proposals: [AdminProposal!]! @derivedFrom(field: "plugin")
+  administrators: [AdministratorAdminPlugin!]! @derivedFrom(field: "plugin")
+}
+
+type Administrator @entity(immutable: true) {
+  id: ID! # address
+  address: String # address as string to facilitate filtering by address on the UI
+  proposals: [AdminProposal!]! @derivedFrom(field: "administrator")
+  plugins: [AdministratorAdminPlugin!]! @derivedFrom(field: "administrator")
+}
+
+type AdministratorAdminPlugin @entity {
+  "for Many-to-Many"
+  id: ID! # Administrator + plugin
+  administrator: Administrator!
+  plugin: AdminPlugin!
+}
+
+type AdminProposal implements IProposal @entity {
+  id: ID! # plugin + proposalId
+  dao: Bytes!
+  creator: Bytes! # Administrator address
+  metadata: String
+  actions: [Action!]! @derivedFrom(field: "proposal")
+  allowFailureMap: BigInt!
+  failureMap: BigInt
+  executed: Boolean!
+  createdAt: BigInt!
+  startDate: BigInt!
+  endDate: BigInt!
+  plugin: AdminPlugin!
+  pluginProposalId: BigInt!
+  administrator: Administrator!
+  executionTxHash: Bytes
+}
+
+type Action @entity {
+  id: ID!
+  to: Bytes!
+  value: BigInt!
+  data: Bytes!
+  dao: Bytes!
+  proposal: IProposal!
+  execResult: Bytes
+}
+
+interface IProposal {
+  id: ID! # ProposalEntityId
+  dao: Bytes!
+  creator: Bytes!
+  metadata: String
+  actions: [Action!]! @derivedFrom(field: "proposal")
+  allowFailureMap: BigInt!
+  failureMap: BigInt
+  executed: Boolean!
+  createdAt: BigInt!
+  startDate: BigInt!
+  endDate: BigInt!
+  executionTxHash: Bytes
 }

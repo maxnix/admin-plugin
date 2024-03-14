@@ -1,3 +1,4 @@
+// ! remove
 import {DaoPlugin} from '../../generated/schema';
 import {NumberStored} from '../../generated/templates/Plugin/Plugin';
 import {generatePluginInstallationEntityId} from '@aragon/osx-commons-subgraph';
