@@ -123,15 +123,6 @@ async function fixture(): Promise<FixtureResult> {
     throw `Deployments are not available on network ${network}.`;
   }
 
-  const network = getNetworkNameByAlias(productionNetworkName);
-  if (network === null) {
-    throw new UnsupportedNetworkError(productionNetworkName);
-  }
-  const networkDeployments = getLatestNetworkDeployment(network);
-  if (networkDeployments === null) {
-    throw `Deployments are not available on network ${network}.`;
-  }
-
   // Get the `PluginSetupProcessor` from the network
   const psp = PluginSetupProcessor__factory.connect(
     networkDeployments.PluginSetupProcessor.address,
