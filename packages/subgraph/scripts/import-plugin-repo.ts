@@ -37,6 +37,7 @@ function extractAndWriteAddressToTS(): void {
     );
     networkRepoAddress = ZERO_ADDRESS;
   }
+
   const tsContent: string[] = [
     `export const PLUGIN_REPO_ADDRESS = '${networkRepoAddress}';`,
   ];
