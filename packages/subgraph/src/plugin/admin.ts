@@ -40,7 +40,7 @@ export function _handleProposalCreated(
   const administratorAddress = event.params.creator;
 
   const proposalEntity = new AdminProposal(proposalEntityId);
-  proposalEntity.dao = Address.fromHexString(daoId);
+  proposalEntity.daoAddress = Address.fromHexString(daoId);
   proposalEntity.plugin = pluginEntityId;
   proposalEntity.pluginProposalId = pluginProposalId;
   proposalEntity.creator = administratorAddress;
@@ -81,7 +81,7 @@ export function _handleProposalCreated(
     actionEntity.to = action.to;
     actionEntity.value = action.value;
     actionEntity.data = action.data;
-    actionEntity.dao = Address.fromHexString(daoId);
+    actionEntity.daoAddress = Address.fromHexString(daoId);
     actionEntity.proposal = proposalEntityId;
     actionEntity.save();
   }
