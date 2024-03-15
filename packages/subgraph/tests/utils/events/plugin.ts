@@ -4,6 +4,11 @@ import {
   ProposalExecuted,
 } from '../../../generated/templates/Admin/Admin';
 import {
+  Granted,
+  Revoked,
+} from '../../../generated/templates/AdminMembers/PermissionManager';
+import {
+  ADDRESS_ZERO,
   ADDRESS_ONE,
   ADDRESS_TWO,
   STRING_DATA,
@@ -13,6 +18,7 @@ import {
   CONTRACT_ADDRESS,
   DAO_ADDRESS,
 } from '../constants';
+import {AdminMembers} from './../../../generated/templates';
 import {Address, BigInt, Bytes, ethereum} from '@graphprotocol/graph-ts';
 import {newMockEvent} from 'matchstick-as';
 
@@ -90,6 +96,83 @@ export function createProposalExecutedEvent(
   createProposalExecutedEvent.parameters.push(proposalIdParam);
 
   return createProposalExecutedEvent;
+}
+
+export function createGrantedEvent(
+  dao: string,
+  plugin: string,
+  member: string,
+  permissionId: string
+): Granted {
+  let newGrantedEvent = changetype<Granted>(newMockEvent());
+
+  newGrantedEvent.address = Address.fromString(dao);
+  newGrantedEvent.parameters = [];
+
+  let permissionIdParam = new ethereum.EventParam(
+    'permissionId',
+    ethereum.Value.fromBytes(Bytes.fromHexString(permissionId))
+  );
+  let hereParam = new ethereum.EventParam(
+    'here',
+    ethereum.Value.fromAddress(Address.fromString(dao))
+  );
+  let whereParam = new ethereum.EventParam(
+    'where',
+    ethereum.Value.fromAddress(Address.fromString(plugin))
+  );
+  let whoParam = new ethereum.EventParam(
+    'who',
+    ethereum.Value.fromAddress(Address.fromString(member))
+  );
+  let conditionParam = new ethereum.EventParam(
+    'condition',
+    ethereum.Value.fromAddress(Address.fromString(ADDRESS_ZERO))
+  );
+
+  newGrantedEvent.parameters.push(permissionIdParam);
+  newGrantedEvent.parameters.push(hereParam);
+  newGrantedEvent.parameters.push(whereParam);
+  newGrantedEvent.parameters.push(whoParam);
+  newGrantedEvent.parameters.push(conditionParam);
+
+  return newGrantedEvent;
+}
+
+export function createRevokedEvent(
+  dao: string,
+  plugin: string,
+  member: string,
+  permissionId: string
+): Revoked {
+  let newRevokedEvent = changetype<Revoked>(newMockEvent());
+
+  newRevokedEvent.address = Address.fromString(dao);
+  newRevokedEvent.parameters = [];
+
+  let permissionIdParam = new ethereum.EventParam(
+    'permissionId',
+    ethereum.Value.fromBytes(Bytes.fromHexString(permissionId))
+  );
+  let hereParam = new ethereum.EventParam(
+    'here',
+    ethereum.Value.fromAddress(Address.fromString(dao))
+  );
+  let whereParam = new ethereum.EventParam(
+    'where',
+    ethereum.Value.fromAddress(Address.fromString(plugin))
+  );
+  let whoParam = new ethereum.EventParam(
+    'who',
+    ethereum.Value.fromAddress(Address.fromString(member))
+  );
+
+  newRevokedEvent.parameters.push(permissionIdParam);
+  newRevokedEvent.parameters.push(hereParam);
+  newRevokedEvent.parameters.push(whereParam);
+  newRevokedEvent.parameters.push(whoParam);
+
+  return newRevokedEvent;
 }
 
 // state
