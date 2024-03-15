@@ -44,6 +44,7 @@ templates:
       language: wasm/assemblyscript
       entities:
         - Dao
+      file: ./src/plugin/admin.ts
       abis:
         - name: Admin
           file: $PLUGIN_MODULE/contracts/artifacts/src/Admin.sol/Admin.json
@@ -54,4 +55,4 @@ templates:
           handler: handleProposalExecuted
         - event: ProposalCreated(indexed uint256,indexed address,uint64,uint64,bytes,(address,uint256,bytes)[],uint256)
           handler: handleProposalCreated
-      file: ./src/plugin/admin.ts
+          
