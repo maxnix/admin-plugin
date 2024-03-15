@@ -31,7 +31,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     if (networkConfig === null) {
       throw new UnsupportedNetworkError(productionNetworkName);
     }
-
     await hre.network.provider.request({
       method: 'hardhat_reset',
       params: [
