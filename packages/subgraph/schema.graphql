@@ -1,13 +1,12 @@
 interface IPlugin {
   id: ID! # PluginInstallationEntityId
-  dao: Bytes!
+  daoAddress: Bytes!
   pluginAddress: Bytes!
 }
 
 type AdminPlugin implements IPlugin @entity {
-  "TODO: attributes should be appended to Plugin once plugin is separated from Aragon OSx"
-  id: ID!
-  dao: Bytes!
+  id: ID! # !check how is generated
+  daoAddress: Bytes!
   pluginAddress: Bytes!
 
   proposals: [AdminProposal!]! @derivedFrom(field: "plugin")
@@ -30,7 +29,7 @@ type AdministratorAdminPlugin @entity {
 
 type AdminProposal implements IProposal @entity {
   id: ID! # plugin + proposalId
-  dao: Bytes!
+  daoAddress: Bytes!
   creator: Bytes! # Administrator address
   metadata: String
   actions: [Action!]! @derivedFrom(field: "proposal")
@@ -51,14 +50,14 @@ type Action @entity {
   to: Bytes!
   value: BigInt!
   data: Bytes!
-  dao: Bytes!
+  daoAddress: Bytes!
   proposal: IProposal!
   execResult: Bytes
 }
 
 interface IProposal {
   id: ID! # ProposalEntityId
-  dao: Bytes!
+  daoAddress: Bytes!
   creator: Bytes!
   metadata: String
   actions: [Action!]! @derivedFrom(field: "proposal")
