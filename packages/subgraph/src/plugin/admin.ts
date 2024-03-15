@@ -4,12 +4,12 @@ import {
   AdminProposal,
   Administrator,
 } from '../../generated/schema';
+import {AdminMembers} from '../../generated/templates';
 import {
   MembershipContractAnnounced,
   ProposalCreated,
   ProposalExecuted,
 } from '../../generated/templates/Admin/Admin';
-// import {AdminMembers} from '../../generated/templates';
 import {generateAdministratorAdminPluginEntityId} from '../utils/ids';
 import {
   generateActionEntityId,
@@ -113,5 +113,5 @@ export function handleMembershipContractAnnounced(
     'permissionId',
     '0xf281525e53675515a6ba7cc7bea8a81e649b3608423ee2d73be1752cea887889' // keccack256 of EXECUTE_PROPOSAL_PERMISSION
   );
-  // AdminMembers.createWithContext(event.params.definingContract, context);
+  AdminMembers.createWithContext(event.params.definingContract, context);
 }
