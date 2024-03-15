@@ -20,7 +20,7 @@ import {
   createAdminProposalState,
 } from '../utils/events/plugin';
 import {
-  generateActionEntityId, //   generateDaoEntityId,
+  generateActionEntityId,
   generatePluginEntityId,
   generateProposalEntityId,
   createDummyAction,
@@ -96,7 +96,12 @@ describe('Plugin', () => {
         'id',
         proposalEntityId
       );
-      assert.fieldEquals('AdminProposal', proposalEntityId, 'dao', DAO_ADDRESS);
+      assert.fieldEquals(
+        'AdminProposal',
+        proposalEntityId,
+        'daoAddress',
+        DAO_ADDRESS
+      );
       assert.fieldEquals(
         'AdminProposal',
         proposalEntityId,
@@ -161,7 +166,12 @@ describe('Plugin', () => {
           assert.fieldEquals('Action', actionEntityId, 'to', ADDRESS_TWO);
           assert.fieldEquals('Action', actionEntityId, 'value', actionValue);
           assert.fieldEquals('Action', actionEntityId, 'data', actionData);
-          assert.fieldEquals('Action', actionEntityId, 'dao', DAO_ADDRESS);
+          assert.fieldEquals(
+            'Action',
+            actionEntityId,
+            'daoAddress',
+            DAO_ADDRESS
+          );
           assert.fieldEquals(
             'Action',
             actionEntityId,
@@ -188,7 +198,7 @@ describe('Plugin', () => {
       action.to = Address.fromString(ADDRESS_TWO);
       action.value = BigInt.fromString(actionValue);
       action.data = Bytes.fromHexString(actionData);
-      action.dao = Address.fromString(DAO_ADDRESS);
+      action.daoAddress = Address.fromString(DAO_ADDRESS);
       action.proposal = proposalEntityId;
       action.save();
 

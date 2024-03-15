@@ -183,7 +183,7 @@ export function createAdminPluginState(
   pluginAddress: string = CONTRACT_ADDRESS
 ): AdminPlugin {
   let adminPlugin = new AdminPlugin(pluginEntityId);
-  adminPlugin.dao = Address.fromString(dao);
+  adminPlugin.daoAddress = Address.fromString(dao);
   adminPlugin.pluginAddress = Address.fromString(pluginAddress);
   adminPlugin.save();
 
@@ -197,7 +197,7 @@ export function createAdminProposalState(
   pluginEntityId: string = CONTRACT_ADDRESS
 ): AdminProposal {
   let adminProposal = new AdminProposal(proposalEntityId);
-  adminProposal.dao = Address.fromString(daoEntityId);
+  adminProposal.daoAddress = Address.fromString(daoEntityId);
   adminProposal.plugin = pluginEntityId;
   adminProposal.pluginProposalId = BigInt.fromString(PLUGIN_PROPOSAL_ID);
   adminProposal.creator = administratorAddress;
