@@ -20,9 +20,16 @@ import {Address, dataSource, DataSourceContext} from '@graphprotocol/graph-ts';
 
 export function handleProposalCreated(event: ProposalCreated): void {
   const context = dataSource.context();
-  const daoAddr = Address.fromHexString(context.getString('daoAddress'));
+  const daoId = context.getString('daoAddress');
   const metadata = event.params.metadata.toString();
+  _handleProposalCreated(event, daoId, metadata);
+}
 
+export function _handleProposalCreated(
+  event: ProposalCreated,
+  daoId: string,
+  metadata: string
+): void {
   const pluginProposalId = event.params.proposalId;
   const pluginAddress = event.address;
   const pluginEntityId = generatePluginEntityId(pluginAddress);
@@ -33,7 +40,7 @@ export function handleProposalCreated(event: ProposalCreated): void {
   const administratorAddress = event.params.creator;
 
   const proposalEntity = new AdminProposal(proposalEntityId);
-  proposalEntity.dao = daoAddr;
+  proposalEntity.dao = Address.fromHexString(daoId);
   proposalEntity.plugin = pluginEntityId;
   proposalEntity.pluginProposalId = pluginProposalId;
   proposalEntity.creator = administratorAddress;
@@ -74,7 +81,7 @@ export function handleProposalCreated(event: ProposalCreated): void {
     actionEntity.to = action.to;
     actionEntity.value = action.value;
     actionEntity.data = action.data;
-    actionEntity.dao = daoAddr;
+    actionEntity.dao = Address.fromHexString(daoId);
     actionEntity.proposal = proposalEntityId;
     actionEntity.save();
   }
@@ -106,5 +113,5 @@ export function handleMembershipContractAnnounced(
     'permissionId',
     '0xf281525e53675515a6ba7cc7bea8a81e649b3608423ee2d73be1752cea887889' // keccack256 of EXECUTE_PROPOSAL_PERMISSION
   );
-  AdminMembers.createWithContext(event.params.definingContract, context);
+  // AdminMembers.createWithContext(event.params.definingContract, context);
 }
