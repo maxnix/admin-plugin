@@ -43,7 +43,9 @@ templates:
       apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
-        - Dao
+        - AdminPlugin
+        - AdminProposal
+        - Action
       file: ./src/plugin/admin.ts
       abis:
         - name: Admin
@@ -64,9 +66,9 @@ templates:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ./src/plugin/adminMembers.ts
       entities:
         - Administrator
+      file: ./src/plugin/adminMembers.ts
       abis:
         - name: PermissionManager
           file: ./imported/PermissionManager.json
