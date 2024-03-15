@@ -76,8 +76,8 @@ describe('OSx', () => {
 
         handleInstallationPrepared(event1);
 
-        assert.notInStore('DaoPlugin', installationId!);
-        assert.entityCount('DaoPlugin', 0);
+        assert.notInStore('AdminPlugin', installationId!);
+        assert.entityCount('AdminPlugin', 0);
 
         const thisPluginRepoAddress = PLUGIN_REPO_ADDRESS;
 
@@ -95,8 +95,13 @@ describe('OSx', () => {
 
         handleInstallationPrepared(event2);
 
-        assert.entityCount('DaoPlugin', 1);
-        assert.fieldEquals('DaoPlugin', installationId!, 'id', installationId!);
+        assert.entityCount('AdminPlugin', 1);
+        assert.fieldEquals(
+          'AdminPlugin',
+          installationId!,
+          'id',
+          installationId!
+        );
       });
     });
   });
