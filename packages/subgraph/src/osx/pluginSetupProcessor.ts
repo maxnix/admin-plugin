@@ -28,7 +28,7 @@ export function handleInstallationPrepared(event: InstallationPrepared): void {
   }
 
   // Set the DAO and plugin address for the plugin entity.
-  pluginEntity.dao = daoAddress;
+  pluginEntity.daoAddress = daoAddress;
   pluginEntity.pluginAddress = pluginAddress;
 
   // Initialize a context for the plugin data source to enable indexing from the moment of preparation.
