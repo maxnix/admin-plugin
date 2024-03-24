@@ -20,14 +20,14 @@ import {Address, dataSource, DataSourceContext} from '@graphprotocol/graph-ts';
 
 export function handleProposalCreated(event: ProposalCreated): void {
   const context = dataSource.context();
-  const daoId = context.getString('daoAddress');
+  const daoAddress = context.getString('daoAddress');
   const metadata = event.params.metadata.toString();
-  _handleProposalCreated(event, daoId, metadata);
+  _handleProposalCreated(event, daoAddress, metadata);
 }
 
 export function _handleProposalCreated(
   event: ProposalCreated,
-  daoId: string,
+  daoAddress: string,
   metadata: string
 ): void {
   const pluginProposalId = event.params.proposalId;
@@ -40,7 +40,7 @@ export function _handleProposalCreated(
   const administratorAddress = event.params.creator;
 
   const proposalEntity = new AdminProposal(proposalEntityId);
-  proposalEntity.daoAddress = Address.fromHexString(daoId);
+  proposalEntity.daoAddress = Address.fromHexString(daoAddress);
   proposalEntity.plugin = pluginEntityId;
   proposalEntity.pluginProposalId = pluginProposalId;
   proposalEntity.creator = administratorAddress;
@@ -81,7 +81,7 @@ export function _handleProposalCreated(
     actionEntity.to = action.to;
     actionEntity.value = action.value;
     actionEntity.data = action.data;
-    actionEntity.daoAddress = Address.fromHexString(daoId);
+    actionEntity.daoAddress = Address.fromHexString(daoAddress);
     actionEntity.proposal = proposalEntityId;
     actionEntity.save();
   }
