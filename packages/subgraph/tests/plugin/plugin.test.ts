@@ -184,6 +184,7 @@ describe('Plugin', () => {
       clearStore();
     });
   });
+
   describe('handleProposalExecuted', () => {
     test('test the event', () => {
       // create state

@@ -179,11 +179,11 @@ export function createRevokedEvent(
 
 export function createAdminPluginState(
   pluginEntityId: string,
-  dao: string = DAO_ADDRESS,
+  daoAddress: string = DAO_ADDRESS,
   pluginAddress: string = CONTRACT_ADDRESS
 ): AdminPlugin {
   let adminPlugin = new AdminPlugin(pluginEntityId);
-  adminPlugin.daoAddress = Address.fromString(dao);
+  adminPlugin.daoAddress = Address.fromString(daoAddress);
   adminPlugin.pluginAddress = Address.fromString(pluginAddress);
   adminPlugin.save();
 
