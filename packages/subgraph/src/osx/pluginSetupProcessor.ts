@@ -18,11 +18,10 @@ export function handleInstallationPrepared(event: InstallationPrepared): void {
 
   const daoAddress = event.params.dao;
   const pluginAddress = event.params.plugin;
+  const pluginId = generatePluginEntityId(pluginAddress);
 
-  const pluginId = generatePluginEntityId(daoAddress);
+  // Load or create a new entry for the this plugin using the generated plugin ID.
   let pluginEntity = AdminPlugin.load(pluginId);
-
-  // Load or create a new entry for the this plugin using the generated installation ID.
   if (!pluginEntity) {
     pluginEntity = new AdminPlugin(pluginId);
   }
