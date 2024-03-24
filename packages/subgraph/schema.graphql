@@ -1,11 +1,11 @@
 interface IPlugin {
-  id: ID! # PluginInstallationEntityId
+  id: ID! # plugin address
   daoAddress: Bytes!
   pluginAddress: Bytes!
 }
 
 type AdminPlugin implements IPlugin @entity {
-  id: ID! # !check how is generated
+  id: ID! # plugin address
   daoAddress: Bytes!
   pluginAddress: Bytes!
 
