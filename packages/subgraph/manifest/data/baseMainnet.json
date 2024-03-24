@@ -10,9 +10,9 @@
       }
     ],
     "Plugin": {
-      "name": "MyPlugin",
-      "address": null,
-      "startBlock": 7727664
+      "name": "AdminRepo",
+      "address": "0x212eF339C77B3390599caB4D46222D79fAabcb5c",
+      "startBlock": 2094800
     }
   }
 }
