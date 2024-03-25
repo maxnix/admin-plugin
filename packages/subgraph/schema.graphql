@@ -5,7 +5,7 @@ interface IPlugin {
 }
 
 type AdminPlugin implements IPlugin @entity {
-  id: ID! # plugin address
+  id: ID! # PluginEntityID
   daoAddress: Bytes!
   pluginAddress: Bytes!
   proposals: [AdminProposal!]! @derivedFrom(field: "plugin")
