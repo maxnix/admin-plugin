@@ -158,27 +158,20 @@ describe('Plugin', () => {
       );
 
       // check actions
-      for (let index = 0; index < actions.length; index++) {
-        const actionEntityId = generateActionEntityId(proposalEntityId, index);
-        const actionEntity = Action.load(actionEntityId);
-        if (actionEntity) {
-          assert.fieldEquals('Action', actionEntityId, 'id', actionEntityId);
-          assert.fieldEquals('Action', actionEntityId, 'to', ADDRESS_TWO);
-          assert.fieldEquals('Action', actionEntityId, 'value', actionValue);
-          assert.fieldEquals('Action', actionEntityId, 'data', actionData);
-          assert.fieldEquals(
-            'Action',
-            actionEntityId,
-            'daoAddress',
-            DAO_ADDRESS
-          );
-          assert.fieldEquals(
-            'Action',
-            actionEntityId,
-            'proposal',
-            proposalEntityId
-          );
-        }
+      const actionEntityId = generateActionEntityId(proposalEntityId, 0);
+      const actionEntity = Action.load(actionEntityId);
+      if (actionEntity) {
+        assert.fieldEquals('Action', actionEntityId, 'id', actionEntityId);
+        assert.fieldEquals('Action', actionEntityId, 'to', ADDRESS_TWO);
+        assert.fieldEquals('Action', actionEntityId, 'value', actionValue);
+        assert.fieldEquals('Action', actionEntityId, 'data', actionData);
+        assert.fieldEquals('Action', actionEntityId, 'daoAddress', DAO_ADDRESS);
+        assert.fieldEquals(
+          'Action',
+          actionEntityId,
+          'proposal',
+          proposalEntityId
+        );
       }
 
       clearStore();
