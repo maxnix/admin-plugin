@@ -1,5 +1,6 @@
 import {Administrator, AdministratorAdminPlugin} from '../../generated/schema';
 import {handleGranted, handleRevoked} from '../../src/plugin/adminMembers';
+import {EXECUTE_PROPOSAL_PERMISSION_HASH} from '../../src/utils/constants';
 import {generateAdministratorAdminPluginEntityId} from '../../src/utils/ids';
 import {ADDRESS_ONE, ADDRESS_TWO, DAO_ADDRESS} from '../utils/constants';
 import {createGrantedEvent, createRevokedEvent} from '../utils/events/plugin';
@@ -22,8 +23,7 @@ const pluginEntityId = generateEntityIdFromAddress(pluginAddress);
 
 describe('AdminMembers', function () {
   // keccack256 of EXECUTE_PROPOSAL_PERMISSION
-  const AdminPermission =
-    '0xf281525e53675515a6ba7cc7bea8a81e649b3608423ee2d73be1752cea887889';
+  const AdminPermission = EXECUTE_PROPOSAL_PERMISSION_HASH;
 
   beforeEach(function () {
     let context = new DataSourceContext();
