@@ -10,6 +10,7 @@ import {
   ProposalCreated,
   ProposalExecuted,
 } from '../../generated/templates/Plugin/Admin';
+import {EXECUTE_PROPOSAL_PERMISSION_HASH} from '../utils/constants';
 import {generateAdministratorAdminPluginEntityId} from '../utils/ids';
 import {
   generateActionEntityId,
@@ -109,9 +110,6 @@ export function handleMembershipContractAnnounced(
 ): void {
   const context = new DataSourceContext();
   context.setString('pluginAddress', event.address.toHexString());
-  context.setString(
-    'permissionId',
-    '0xf281525e53675515a6ba7cc7bea8a81e649b3608423ee2d73be1752cea887889' // keccack256 of EXECUTE_PROPOSAL_PERMISSION
-  );
+  context.setString('permissionId', EXECUTE_PROPOSAL_PERMISSION_HASH);
   AdminMembers.createWithContext(event.params.definingContract, context);
 }
