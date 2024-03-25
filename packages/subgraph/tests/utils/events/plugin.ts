@@ -1,12 +1,12 @@
 import {AdminPlugin, AdminProposal} from '../../../generated/schema';
 import {
-  ProposalCreated,
-  ProposalExecuted,
-} from '../../../generated/templates/Admin/Admin';
-import {
   Granted,
   Revoked,
 } from '../../../generated/templates/AdminMembers/PermissionManager';
+import {
+  ProposalCreated,
+  ProposalExecuted,
+} from '../../../generated/templates/Plugin/Admin';
 import {
   ADDRESS_ZERO,
   ADDRESS_ONE,

@@ -1,6 +1,6 @@
 import {InstallationPrepared} from '../../generated/PluginSetupProcessor/PluginSetupProcessor';
 import {AdminPlugin} from '../../generated/schema';
-import {Admin as PluginTemplate} from '../../generated/templates';
+import {Plugin as PluginTemplate} from '../../generated/templates';
 import {PLUGIN_REPO_ADDRESS} from '../../imported/repo-address';
 import {generatePluginEntityId} from '@aragon/osx-commons-subgraph';
 import {Address, DataSourceContext} from '@graphprotocol/graph-ts';
