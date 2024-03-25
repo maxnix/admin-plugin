@@ -56,11 +56,11 @@ export function handleRevoked(event: Revoked): void {
       event.params.where.toHexString()
     )
   ) {
-    // where is the plugin address
-    // who is the administrator address
+    const pluginAddress = event.params.where;
+    const administratorMemberAddress = event.params.who;
     const mappingId = generateAdministratorAdminPluginEntityId(
-      event.params.where,
-      event.params.who
+      pluginAddress,
+      administratorMemberAddress
     );
     if (AdministratorAdminPlugin.load(mappingId)) {
       store.remove('AdministratorAdminPlugin', mappingId);
