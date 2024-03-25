@@ -18,29 +18,31 @@ export function handleGranted(event: Granted): void {
     )
   ) {
     const pluginAddress = event.params.where;
-    const administratorAddress = event.params.who;
+    const administratorMemberAddress = event.params.who;
     const pluginEntityId = generatePluginEntityId(pluginAddress);
-    const administratorEntityId =
-      generateEntityIdFromAddress(administratorAddress);
-    let administrator = Administrator.load(administratorEntityId);
+    const administratorMemberEntityId = generateEntityIdFromAddress(
+      administratorMemberAddress
+    );
+    let administrator = Administrator.load(administratorMemberEntityId);
     if (!administrator) {
-      administrator = new Administrator(administratorEntityId);
-      administrator.address = administratorEntityId;
+      administrator = new Administrator(administratorMemberEntityId);
+      administrator.address = administratorMemberEntityId;
       administrator.save();
     }
 
-    const administratorMappingId = generateAdministratorAdminPluginEntityId(
-      pluginAddress,
-      administratorAddress
-    );
+    const administratorAdminMappingId =
+      generateAdministratorAdminPluginEntityId(
+        pluginAddress,
+        administratorMemberAddress
+      );
     let administratorPluginMapping = AdministratorAdminPlugin.load(
-      administratorMappingId
+      administratorAdminMappingId
     );
     if (!administratorPluginMapping) {
       administratorPluginMapping = new AdministratorAdminPlugin(
-        administratorMappingId
+        administratorAdminMappingId
       );
-      administratorPluginMapping.administrator = administratorEntityId;
+      administratorPluginMapping.administrator = administratorMemberEntityId;
       administratorPluginMapping.plugin = pluginEntityId;
       administratorPluginMapping.save();
     }
