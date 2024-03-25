@@ -8,7 +8,6 @@ type AdminPlugin implements IPlugin @entity {
   id: ID! # plugin address
   daoAddress: Bytes!
   pluginAddress: Bytes!
-
   proposals: [AdminProposal!]! @derivedFrom(field: "plugin")
   administrators: [AdministratorAdminPlugin!]! @derivedFrom(field: "plugin")
 }
