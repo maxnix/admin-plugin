@@ -2,7 +2,7 @@ import {Action} from '../../generated/schema';
 import {
   handleProposalExecuted,
   _handleProposalCreated,
-} from '../../src/plugin/admin';
+} from '../../src/plugin/plugin';
 import {
   ADDRESS_ONE,
   ADDRESS_TWO,
