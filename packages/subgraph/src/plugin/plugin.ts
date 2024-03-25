@@ -9,7 +9,7 @@ import {
   MembershipContractAnnounced,
   ProposalCreated,
   ProposalExecuted,
-} from '../../generated/templates/Admin/Admin';
+} from '../../generated/templates/Plugin/Admin';
 import {generateAdministratorAdminPluginEntityId} from '../utils/ids';
 import {
   generateActionEntityId,
