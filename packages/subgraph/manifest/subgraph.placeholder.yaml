@@ -33,7 +33,7 @@ dataSources:
 # templates
 templates:
   # Plugin
-  - name: Admin
+  - name: Plugin
     kind: ethereum/contract
     network: {{network}}
     source:
@@ -46,7 +46,7 @@ templates:
         - AdminPlugin
         - AdminProposal
         - Action
-      file: ./src/plugin/admin.ts
+      file: ./src/plugin/plugin.ts
       abis:
         - name: Admin
           file: $PLUGIN_MODULE/contracts/artifacts/src/Admin.sol/Admin.json
