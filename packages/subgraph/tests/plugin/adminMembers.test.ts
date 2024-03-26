@@ -23,11 +23,10 @@ const pluginEntityId = generateEntityIdFromAddress(pluginAddress);
 
 describe('AdminMembers', function () {
   // keccack256 of EXECUTE_PROPOSAL_PERMISSION
-  const AdminPermission = EXECUTE_PROPOSAL_PERMISSION_HASH;
 
   beforeEach(function () {
     let context = new DataSourceContext();
-    context.setString('permissionId', AdminPermission);
+    context.setString('permissionId', EXECUTE_PROPOSAL_PERMISSION_HASH);
     context.setString('pluginAddress', pluginEntityId);
     dataSourceMock.setContext(context);
   });
@@ -38,10 +37,10 @@ describe('AdminMembers', function () {
 
   test('handleGranted', function () {
     let event = createGrantedEvent(
+      EXECUTE_PROPOSAL_PERMISSION_HASH,
       DAO_ADDRESS,
       pluginEntityId,
-      adminEntityId,
-      AdminPermission
+      adminEntityId
     );
     handleGranted(event);
 
@@ -92,20 +91,24 @@ describe('AdminMembers', function () {
     let administratorAdminPluginEntity = new AdministratorAdminPlugin(
       administratorAdminPluginId
     );
-    administratorAdminPluginEntity.administrator = ADDRESS_TWO;
-    administratorAdminPluginEntity.plugin = ADDRESS_ONE;
+    administratorAdminPluginEntity.administrator = adminEntityId;
+    administratorAdminPluginEntity.plugin = pluginEntityId;
     administratorAdminPluginEntity.save();
 
-    let revokedEvent = createRevokedEvent(
-      DAO_ADDRESS,
-      adminEntityId,
-      pluginEntityId,
-      AdminPermission
-    );
+    assert.entityCount('Administrator', 1);
+    assert.entityCount('AdministratorAdminPlugin', 1);
 
+    let revokedEvent = createRevokedEvent(
+      EXECUTE_PROPOSAL_PERMISSION_HASH,
+      DAO_ADDRESS,
+      pluginEntityId,
+      adminEntityId
+    );
     handleRevoked(revokedEvent);
 
+    // when revoking the permission the admin is not removed, only the mapping with the admin plugin
     assert.entityCount('Administrator', 1);
-    // assert.notInStore('AdministratorAdminPlugin', administratorAdminPluginId);
+    assert.entityCount('AdministratorAdminPlugin', 0);
+    assert.notInStore('AdministratorAdminPlugin', administratorAdminPluginId);
   });
 });
