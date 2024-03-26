@@ -99,10 +99,10 @@ export function createProposalExecutedEvent(
 }
 
 export function createGrantedEvent(
+  permissionId: string,
   dao: string,
   plugin: string,
-  member: string,
-  permissionId: string
+  member: string
 ): Granted {
   let newGrantedEvent = changetype<Granted>(newMockEvent());
 
@@ -140,10 +140,10 @@ export function createGrantedEvent(
 }
 
 export function createRevokedEvent(
+  permissionId: string,
   dao: string,
   plugin: string,
-  member: string,
-  permissionId: string
+  member: string
 ): Revoked {
   let newRevokedEvent = changetype<Revoked>(newMockEvent());
 
