@@ -1,8 +1,9 @@
-import {Action} from '../../generated/schema';
+import {ProposalAction} from '../../generated/schema';
 import {
   handleProposalExecuted,
   _handleProposalCreated,
 } from '../../src/plugin/plugin';
+import {generateActionEntityId} from '../../src/utils/ids';
 import {
   ADDRESS_ONE,
   ADDRESS_TWO,
@@ -20,7 +21,6 @@ import {
   createAdminProposalState,
 } from '../utils/events/plugin';
 import {
-  generateActionEntityId,
   generatePluginEntityId,
   generateProposalEntityId,
   createDummyAction,
@@ -89,7 +89,8 @@ describe('Plugin', () => {
         BigInt.fromString(PLUGIN_PROPOSAL_ID)
       );
 
-      // checks
+      // check proposal
+      assert.entityCount('AdminProposal', 1);
       assert.fieldEquals(
         'AdminProposal',
         proposalEntityId,
@@ -157,22 +158,41 @@ describe('Plugin', () => {
         ALLOW_FAILURE_MAP
       );
 
-      // check actions
-      const actionEntityId = generateActionEntityId(proposalEntityId, 0);
-      const actionEntity = Action.load(actionEntityId);
-      if (actionEntity) {
-        assert.fieldEquals('Action', actionEntityId, 'id', actionEntityId);
-        assert.fieldEquals('Action', actionEntityId, 'to', ADDRESS_TWO);
-        assert.fieldEquals('Action', actionEntityId, 'value', actionValue);
-        assert.fieldEquals('Action', actionEntityId, 'data', actionData);
-        assert.fieldEquals('Action', actionEntityId, 'daoAddress', DAO_ADDRESS);
-        assert.fieldEquals(
-          'Action',
-          actionEntityId,
-          'proposal',
-          proposalEntityId
-        );
-      }
+      // check action
+      const actionEntityId = generateActionEntityId(
+        pluginAddress,
+        Address.fromString(DAO_ADDRESS),
+        pluginProposalId.toString(),
+        0
+      );
+      const actionEntity = ProposalAction.load(actionEntityId);
+      assert.entityCount('ProposalAction', 1);
+      assert.fieldEquals(
+        'ProposalAction',
+        actionEntityId,
+        'id',
+        actionEntityId
+      );
+      assert.fieldEquals('ProposalAction', actionEntityId, 'to', ADDRESS_TWO);
+      assert.fieldEquals(
+        'ProposalAction',
+        actionEntityId,
+        'value',
+        actionValue
+      );
+      assert.fieldEquals('ProposalAction', actionEntityId, 'data', actionData);
+      assert.fieldEquals(
+        'ProposalAction',
+        actionEntityId,
+        'daoAddress',
+        DAO_ADDRESS
+      );
+      assert.fieldEquals(
+        'ProposalAction',
+        actionEntityId,
+        'proposal',
+        proposalEntityId
+      );
 
       clearStore();
     });
@@ -187,8 +207,13 @@ describe('Plugin', () => {
 
       createAdminProposalState(proposalEntityId, administratorAddress);
 
-      const actionEntityId = generateActionEntityId(proposalEntityId, 0);
-      let action = new Action(actionEntityId);
+      const actionEntityId = generateActionEntityId(
+        pluginAddress,
+        Address.fromString(DAO_ADDRESS),
+        pluginProposalId.toString(),
+        0
+      );
+      let action = new ProposalAction(actionEntityId);
       action.to = Address.fromString(ADDRESS_TWO);
       action.value = BigInt.fromString(actionValue);
       action.data = Bytes.fromHexString(actionData);
@@ -222,5 +247,24 @@ describe('Plugin', () => {
 
       clearStore();
     });
+  });
+
+  test('We correctly generate the action ID', () => {
+    let caller = pluginAddress;
+    let daoAddress = DAO_ADDRESS;
+    let callId = 'c4ll me';
+    let index = 255;
+
+    let actionId = generateActionEntityId(
+      caller,
+      Address.fromString(daoAddress),
+      callId,
+      index
+    );
+
+    assert.stringEquals(
+      actionId,
+      [caller.toHexString(), daoAddress, callId, index.toString()].join('_')
+    );
   });
 });
