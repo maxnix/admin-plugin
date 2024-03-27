@@ -2,6 +2,7 @@ import {Action} from '../../generated/schema';
 import {
   handleProposalExecuted,
   _handleProposalCreated,
+  handleMembershipContractAnnounced,
 } from '../../src/plugin/plugin';
 import {
   ADDRESS_ONE,
@@ -12,10 +13,12 @@ import {
   ALLOW_FAILURE_MAP,
   CONTRACT_ADDRESS,
   DAO_ADDRESS,
+  ADDRESS_ZERO,
 } from '../utils/constants';
 import {
   createNewProposalCreatedEvent,
   createProposalExecutedEvent,
+  createMembershipContractAnnouncedEvent,
   createAdminPluginState,
   createAdminProposalState,
 } from '../utils/events/plugin';
@@ -30,7 +33,9 @@ import {
   Bytes,
   BigInt,
   DataSourceContext,
+  log,
 } from '@graphprotocol/graph-ts';
+import {dataSource} from '@graphprotocol/graph-ts';
 import {
   assert,
   afterEach,
@@ -173,8 +178,6 @@ describe('Plugin', () => {
           proposalEntityId
         );
       }
-
-      clearStore();
     });
   });
 
@@ -219,8 +222,29 @@ describe('Plugin', () => {
         'executionTxHash',
         event.transaction.hash.toHexString()
       );
+    });
+  });
 
-      clearStore();
+  describe('handleMembershipContractAnnounced', () => {
+    test('test the event', () => {
+      let context = dataSource.context();
+
+      assert.dataSourceCount('AdminMembers', 0);
+      assert.assertNull(context.get('pluginAddress'));
+      assert.assertNull(context.get('permissionId'));
+
+      // create event
+      let event = createMembershipContractAnnouncedEvent(
+        DAO_ADDRESS,
+        pluginAddress
+      );
+
+      // handle event
+      handleMembershipContractAnnounced(event);
+
+      // check
+      assert.dataSourceCount('AdminMembers', 1);
+      assert.dataSourceExists('AdminMembers', DAO_ADDRESS);
     });
   });
 });
