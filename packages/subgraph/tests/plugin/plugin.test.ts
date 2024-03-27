@@ -71,6 +71,10 @@ describe('Plugin', () => {
 
   describe('handleProposalCreated', () => {
     test('test the event', () => {
+      // check the entities are not in the store
+      assert.entityCount('AdminProposal', 0);
+      assert.entityCount('Action', 0);
+
       // create state
       createAdminPluginState(pluginEntityId);
 
@@ -94,7 +98,8 @@ describe('Plugin', () => {
         BigInt.fromString(PLUGIN_PROPOSAL_ID)
       );
 
-      // checks
+      // checks proposal
+      assert.entityCount('AdminProposal', 1);
       assert.fieldEquals(
         'AdminProposal',
         proposalEntityId,
@@ -163,6 +168,7 @@ describe('Plugin', () => {
       );
 
       // check actions
+      assert.entityCount('Action', 1);
       const actionEntityId = generateActionEntityId(proposalEntityId, 0);
       const actionEntity = Action.load(actionEntityId);
       if (actionEntity) {
@@ -198,6 +204,8 @@ describe('Plugin', () => {
       action.daoAddress = Address.fromString(DAO_ADDRESS);
       action.proposal = proposalEntityId;
       action.save();
+
+      assert.entityCount('AdminProposal', 1);
 
       // create event
       let event = createProposalExecutedEvent(

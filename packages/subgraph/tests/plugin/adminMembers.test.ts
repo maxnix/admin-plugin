@@ -36,6 +36,11 @@ describe('AdminMembers', function () {
   });
 
   test('handleGranted', function () {
+    // check the entities are not in the store
+    assert.entityCount('Administrator', 0);
+    assert.entityCount('AdministratorAdminPlugin', 0);
+
+    // create the event and handle it
     let event = createGrantedEvent(
       EXECUTE_PROPOSAL_PERMISSION_HASH,
       DAO_ADDRESS,
@@ -44,6 +49,7 @@ describe('AdminMembers', function () {
     );
     handleGranted(event);
 
+    // check the administrator entity
     assert.entityCount('Administrator', 1);
     assert.fieldEquals('Administrator', adminEntityId, 'id', adminEntityId);
     assert.fieldEquals(
@@ -53,8 +59,8 @@ describe('AdminMembers', function () {
       adminEntityId
     );
 
+    // check the mapping with the admin pluging entity
     assert.entityCount('AdministratorAdminPlugin', 1);
-
     let administratorAdminPluginId = generateAdministratorAdminPluginEntityId(
       pluginAddress,
       adminAddress
@@ -95,9 +101,11 @@ describe('AdminMembers', function () {
     administratorAdminPluginEntity.plugin = pluginEntityId;
     administratorAdminPluginEntity.save();
 
+    // check the entities are in the store
     assert.entityCount('Administrator', 1);
     assert.entityCount('AdministratorAdminPlugin', 1);
 
+    // create revoke event and handle it
     let revokedEvent = createRevokedEvent(
       EXECUTE_PROPOSAL_PERMISSION_HASH,
       DAO_ADDRESS,
