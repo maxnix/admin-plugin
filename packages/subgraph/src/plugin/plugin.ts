@@ -1,5 +1,5 @@
 import {
-  Action,
+  ProposalAction,
   AdministratorAdminPlugin,
   AdminProposal,
   Administrator,
@@ -11,9 +11,11 @@ import {
   ProposalExecuted,
 } from '../../generated/templates/Plugin/Admin';
 import {EXECUTE_PROPOSAL_PERMISSION_HASH} from '../utils/constants';
-import {generateAdministratorAdminPluginEntityId} from '../utils/ids';
 import {
+  generateAdministratorAdminPluginEntityId,
   generateActionEntityId,
+} from '../utils/ids';
+import {
   generatePluginEntityId,
   generateProposalEntityId,
 } from '@aragon/osx-commons-subgraph';
@@ -77,8 +79,13 @@ export function _handleProposalCreated(
   for (let index = 0; index < actions.length; index++) {
     const action = actions[index];
 
-    const actionEntityId = generateActionEntityId(proposalEntityId, index);
-    const actionEntity = new Action(actionEntityId);
+    const actionEntityId = generateActionEntityId(
+      pluginAddress,
+      Address.fromString(daoAddress),
+      pluginProposalId.toString(),
+      index
+    );
+    const actionEntity = new ProposalAction(actionEntityId);
     actionEntity.to = action.to;
     actionEntity.value = action.value;
     actionEntity.data = action.data;
