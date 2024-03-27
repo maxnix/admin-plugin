@@ -10,3 +10,20 @@ export function generateAdministratorAdminPluginEntityId(
     generateEntityIdFromAddress(administratorAddress),
   ].join('_');
 }
+
+/**
+ * @dev TODO: move this to OSx commons subgraph
+ */
+export function generateActionEntityId(
+  caller: Address,
+  daoAddress: Address,
+  callId: string,
+  index: i32
+): string {
+  return [
+    generateEntityIdFromAddress(caller),
+    generateEntityIdFromAddress(daoAddress),
+    callId,
+    index.toString(),
+  ].join('_');
+}
