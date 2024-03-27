@@ -31,9 +31,8 @@ type AdminProposal implements IProposal @entity {
   daoAddress: Bytes!
   creator: Bytes! # Administrator address
   metadata: String
-  actions: [Action!]! @derivedFrom(field: "proposal")
+  actions: [ProposalAction!]! @derivedFrom(field: "proposal")
   allowFailureMap: BigInt!
-  failureMap: BigInt
   executed: Boolean!
   createdAt: BigInt!
   startDate: BigInt!
@@ -44,14 +43,23 @@ type AdminProposal implements IProposal @entity {
   executionTxHash: Bytes
 }
 
-type Action @entity {
+interface IAction {
   id: ID! # ActionEntityId
   to: Bytes!
   value: BigInt!
   data: Bytes!
   daoAddress: Bytes!
+}
+
+type ProposalAction implements IAction @entity(immutable: true) {
+  id: ID! # ActionEntityId
+  to: Bytes!
+  value: BigInt!
+  data: Bytes!
+  daoAddress: Bytes!
+
+  # proposal data
   proposal: IProposal!
-  execResult: Bytes
 }
 
 interface IProposal {
@@ -59,9 +67,8 @@ interface IProposal {
   daoAddress: Bytes!
   creator: Bytes!
   metadata: String
-  actions: [Action!]! @derivedFrom(field: "proposal")
+  actions: [ProposalAction!]! @derivedFrom(field: "proposal")
   allowFailureMap: BigInt!
-  failureMap: BigInt
   executed: Boolean!
   createdAt: BigInt!
   startDate: BigInt!
