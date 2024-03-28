@@ -13,7 +13,6 @@ import {
   ALLOW_FAILURE_MAP,
   CONTRACT_ADDRESS,
   DAO_ADDRESS,
-  ADDRESS_ZERO,
 } from '../utils/constants';
 import {
   createNewProposalCreatedEvent,
@@ -33,7 +32,6 @@ import {
   Bytes,
   BigInt,
   DataSourceContext,
-  log,
 } from '@graphprotocol/graph-ts';
 import {dataSource} from '@graphprotocol/graph-ts';
 import {
