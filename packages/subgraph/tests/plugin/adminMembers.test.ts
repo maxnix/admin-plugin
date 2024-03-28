@@ -1,6 +1,6 @@
 import {Administrator, AdministratorAdminPlugin} from '../../generated/schema';
 import {handleGranted, handleRevoked} from '../../src/plugin/adminMembers';
-import {EXECUTE_PROPOSAL_PERMISSION_HASH} from '../../src/utils/constants';
+import {EXECUTE_PROPOSAL_PERMISSION_ID} from '../../src/utils/constants';
 import {generateAdministratorAdminPluginEntityId} from '../../src/utils/ids';
 import {ADDRESS_ONE, ADDRESS_TWO, DAO_ADDRESS} from '../utils/constants';
 import {createGrantedEvent, createRevokedEvent} from '../utils/events/plugin';
@@ -26,7 +26,7 @@ describe('AdminMembers', function () {
 
   beforeEach(function () {
     let context = new DataSourceContext();
-    context.setString('permissionId', EXECUTE_PROPOSAL_PERMISSION_HASH);
+    context.setString('permissionId', EXECUTE_PROPOSAL_PERMISSION_ID);
     context.setString('pluginAddress', pluginEntityId);
     dataSourceMock.setContext(context);
   });
@@ -42,7 +42,7 @@ describe('AdminMembers', function () {
 
     // create the event and handle it
     let event = createGrantedEvent(
-      EXECUTE_PROPOSAL_PERMISSION_HASH,
+      EXECUTE_PROPOSAL_PERMISSION_ID,
       DAO_ADDRESS,
       pluginEntityId,
       administratorEntityId
@@ -112,7 +112,7 @@ describe('AdminMembers', function () {
 
     // create revoke event and handle it
     let revokedEvent = createRevokedEvent(
-      EXECUTE_PROPOSAL_PERMISSION_HASH,
+      EXECUTE_PROPOSAL_PERMISSION_ID,
       DAO_ADDRESS,
       pluginEntityId,
       administratorEntityId
