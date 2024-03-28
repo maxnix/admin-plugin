@@ -1,4 +1,4 @@
-import {ProposalAction} from '../../generated/schema';
+import {Action} from '../../generated/schema';
 import {
   handleProposalExecuted,
   _handleProposalCreated,
@@ -165,30 +165,15 @@ describe('Plugin', () => {
         pluginProposalId.toString(),
         0
       );
-      const actionEntity = ProposalAction.load(actionEntityId);
-      assert.entityCount('ProposalAction', 1);
+      const actionEntity = Action.load(actionEntityId);
+      assert.entityCount('Action', 1);
+      assert.fieldEquals('Action', actionEntityId, 'id', actionEntityId);
+      assert.fieldEquals('Action', actionEntityId, 'to', ADDRESS_TWO);
+      assert.fieldEquals('Action', actionEntityId, 'value', actionValue);
+      assert.fieldEquals('Action', actionEntityId, 'data', actionData);
+      assert.fieldEquals('Action', actionEntityId, 'daoAddress', DAO_ADDRESS);
       assert.fieldEquals(
-        'ProposalAction',
-        actionEntityId,
-        'id',
-        actionEntityId
-      );
-      assert.fieldEquals('ProposalAction', actionEntityId, 'to', ADDRESS_TWO);
-      assert.fieldEquals(
-        'ProposalAction',
-        actionEntityId,
-        'value',
-        actionValue
-      );
-      assert.fieldEquals('ProposalAction', actionEntityId, 'data', actionData);
-      assert.fieldEquals(
-        'ProposalAction',
-        actionEntityId,
-        'daoAddress',
-        DAO_ADDRESS
-      );
-      assert.fieldEquals(
-        'ProposalAction',
+        'Action',
         actionEntityId,
         'proposal',
         proposalEntityId
@@ -213,7 +198,7 @@ describe('Plugin', () => {
         pluginProposalId.toString(),
         0
       );
-      let action = new ProposalAction(actionEntityId);
+      let action = new Action(actionEntityId);
       action.to = Address.fromString(ADDRESS_TWO);
       action.value = BigInt.fromString(actionValue);
       action.data = Bytes.fromHexString(actionData);

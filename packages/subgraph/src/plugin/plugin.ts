@@ -1,5 +1,5 @@
 import {
-  ProposalAction,
+  Action,
   AdministratorAdminPlugin,
   AdminProposal,
   Administrator,
@@ -85,7 +85,7 @@ export function _handleProposalCreated(
       pluginProposalId.toString(),
       index
     );
-    const actionEntity = new ProposalAction(actionEntityId);
+    const actionEntity = new Action(actionEntityId);
     actionEntity.to = action.to;
     actionEntity.value = action.value;
     actionEntity.data = action.data;
