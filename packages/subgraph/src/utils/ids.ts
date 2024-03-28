@@ -12,7 +12,7 @@ export function generateAdministratorAdminPluginEntityId(
 }
 
 /**
- * @dev TODO: move this to OSx commons subgraph
+ * @dev TODO: remove this function and use the one in the commons
  */
 export function generateActionEntityId(
   caller: Address,
