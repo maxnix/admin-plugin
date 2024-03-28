@@ -17,7 +17,7 @@ import {
 } from 'matchstick-as/assembly/index';
 
 const adminAddress = Address.fromString(ADDRESS_ONE);
-const adminEntityId = generateEntityIdFromAddress(adminAddress);
+const administratorEntityId = generateEntityIdFromAddress(adminAddress);
 const pluginAddress = Address.fromString(ADDRESS_TWO);
 const pluginEntityId = generateEntityIdFromAddress(pluginAddress);
 
@@ -45,18 +45,23 @@ describe('AdminMembers', function () {
       EXECUTE_PROPOSAL_PERMISSION_HASH,
       DAO_ADDRESS,
       pluginEntityId,
-      adminEntityId
+      administratorEntityId
     );
     handleGranted(event);
 
     // check the administrator entity
     assert.entityCount('Administrator', 1);
-    assert.fieldEquals('Administrator', adminEntityId, 'id', adminEntityId);
     assert.fieldEquals(
       'Administrator',
-      adminEntityId,
+      administratorEntityId,
+      'id',
+      administratorEntityId
+    );
+    assert.fieldEquals(
+      'Administrator',
+      administratorEntityId,
       'address',
-      adminEntityId
+      administratorEntityId
     );
 
     // check the mapping with the admin pluging entity
@@ -75,7 +80,7 @@ describe('AdminMembers', function () {
       'AdministratorAdminPlugin',
       administratorAdminPluginId,
       'administrator',
-      adminEntityId
+      administratorEntityId
     );
     assert.fieldEquals(
       'AdministratorAdminPlugin',
@@ -86,8 +91,8 @@ describe('AdminMembers', function () {
   });
 
   test('handleRevoked', function () {
-    let administrator = new Administrator(adminEntityId);
-    administrator.address = adminEntityId;
+    let administrator = new Administrator(administratorEntityId);
+    administrator.address = administratorEntityId;
     administrator.save();
 
     let administratorAdminPluginId = generateAdministratorAdminPluginEntityId(
@@ -97,7 +102,7 @@ describe('AdminMembers', function () {
     let administratorAdminPluginEntity = new AdministratorAdminPlugin(
       administratorAdminPluginId
     );
-    administratorAdminPluginEntity.administrator = adminEntityId;
+    administratorAdminPluginEntity.administrator = administratorEntityId;
     administratorAdminPluginEntity.plugin = pluginEntityId;
     administratorAdminPluginEntity.save();
 
@@ -110,7 +115,7 @@ describe('AdminMembers', function () {
       EXECUTE_PROPOSAL_PERMISSION_HASH,
       DAO_ADDRESS,
       pluginEntityId,
-      adminEntityId
+      administratorEntityId
     );
     handleRevoked(revokedEvent);
 
