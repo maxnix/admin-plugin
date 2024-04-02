@@ -13,9 +13,9 @@ import {
 import {EXECUTE_PROPOSAL_PERMISSION_HASH} from '../utils/constants';
 import {generateAdministratorAdminPluginEntityId} from '../utils/ids';
 import {
+  generateActionEntityId,
   generatePluginEntityId,
   generateProposalEntityId,
-  generateActionEntityId,
 } from '@aragon/osx-commons-subgraph';
 import {Address, dataSource, DataSourceContext} from '@graphprotocol/graph-ts';
 
