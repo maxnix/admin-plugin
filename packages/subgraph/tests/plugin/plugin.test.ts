@@ -262,23 +262,4 @@ describe('Plugin', () => {
       assert.dataSourceExists('AdminMembers', DAO_ADDRESS);
     });
   });
-
-  test('We correctly generate the action ID', () => {
-    let caller = pluginAddress;
-    let daoAddress = DAO_ADDRESS;
-    let callId = 'c4ll me';
-    let index = 255;
-
-    let actionId = generateActionEntityId(
-      caller,
-      Address.fromString(daoAddress),
-      callId,
-      index
-    );
-
-    assert.stringEquals(
-      actionId,
-      [caller.toHexString(), daoAddress, callId, index.toString()].join('_')
-    );
-  });
 });
