@@ -2,6 +2,7 @@ import {Action} from '../../generated/schema';
 import {
   handleProposalExecuted,
   _handleProposalCreated,
+  handleMembershipContractAnnounced,
 } from '../../src/plugin/plugin';
 import {
   ADDRESS_ONE,
@@ -16,6 +17,7 @@ import {
 import {
   createNewProposalCreatedEvent,
   createProposalExecutedEvent,
+  createMembershipContractAnnouncedEvent,
   createAdminPluginState,
   createAdminProposalState,
 } from '../utils/events/plugin';
@@ -31,6 +33,7 @@ import {
   BigInt,
   DataSourceContext,
 } from '@graphprotocol/graph-ts';
+import {dataSource} from '@graphprotocol/graph-ts';
 import {
   assert,
   afterEach,
@@ -66,6 +69,10 @@ describe('Plugin', () => {
 
   describe('handleProposalCreated', () => {
     test('test the event', () => {
+      // check the entities are not in the store
+      assert.entityCount('AdminProposal', 0);
+      assert.entityCount('Action', 0);
+
       // create state
       createAdminPluginState(pluginEntityId);
 
@@ -89,7 +96,7 @@ describe('Plugin', () => {
         BigInt.fromString(PLUGIN_PROPOSAL_ID)
       );
 
-      // check proposal
+      // checks proposal
       assert.entityCount('AdminProposal', 1);
       assert.fieldEquals(
         'AdminProposal',
@@ -159,6 +166,7 @@ describe('Plugin', () => {
       );
 
       // check action
+      assert.entityCount('Action', 1);
       const actionEntityId = generateActionEntityId(
         pluginAddress,
         Address.fromString(DAO_ADDRESS),
@@ -204,6 +212,8 @@ describe('Plugin', () => {
       action.proposal = proposalEntityId;
       action.save();
 
+      assert.entityCount('AdminProposal', 1);
+
       // create event
       let event = createProposalExecutedEvent(
         PLUGIN_PROPOSAL_ID,
@@ -227,6 +237,29 @@ describe('Plugin', () => {
         'executionTxHash',
         event.transaction.hash.toHexString()
       );
+    });
+  });
+
+  describe('handleMembershipContractAnnounced', () => {
+    test('test the event', () => {
+      let context = dataSource.context();
+
+      assert.dataSourceCount('AdminMembers', 0);
+      assert.assertNull(context.get('pluginAddress'));
+      assert.assertNull(context.get('permissionId'));
+
+      // create event
+      let event = createMembershipContractAnnouncedEvent(
+        DAO_ADDRESS,
+        pluginAddress
+      );
+
+      // handle event
+      handleMembershipContractAnnounced(event);
+
+      // check
+      assert.dataSourceCount('AdminMembers', 1);
+      assert.dataSourceExists('AdminMembers', DAO_ADDRESS);
     });
   });
 

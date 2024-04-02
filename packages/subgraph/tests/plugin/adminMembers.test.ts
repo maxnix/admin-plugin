@@ -1,6 +1,6 @@
 import {Administrator, AdministratorAdminPlugin} from '../../generated/schema';
 import {handleGranted, handleRevoked} from '../../src/plugin/adminMembers';
-import {EXECUTE_PROPOSAL_PERMISSION_HASH} from '../../src/utils/constants';
+import {EXECUTE_PROPOSAL_PERMISSION_ID} from '../../src/utils/constants';
 import {generateAdministratorAdminPluginEntityId} from '../../src/utils/ids';
 import {ADDRESS_ONE, ADDRESS_TWO, DAO_ADDRESS} from '../utils/constants';
 import {createGrantedEvent, createRevokedEvent} from '../utils/events/plugin';
@@ -17,17 +17,16 @@ import {
 } from 'matchstick-as/assembly/index';
 
 const adminAddress = Address.fromString(ADDRESS_ONE);
-const adminEntityId = generateEntityIdFromAddress(adminAddress);
+const administratorEntityId = generateEntityIdFromAddress(adminAddress);
 const pluginAddress = Address.fromString(ADDRESS_TWO);
 const pluginEntityId = generateEntityIdFromAddress(pluginAddress);
 
 describe('AdminMembers', function () {
   // keccack256 of EXECUTE_PROPOSAL_PERMISSION
-  const AdminPermission = EXECUTE_PROPOSAL_PERMISSION_HASH;
 
   beforeEach(function () {
     let context = new DataSourceContext();
-    context.setString('permissionId', AdminPermission);
+    context.setString('permissionId', EXECUTE_PROPOSAL_PERMISSION_ID);
     context.setString('pluginAddress', pluginEntityId);
     dataSourceMock.setContext(context);
   });
@@ -37,25 +36,36 @@ describe('AdminMembers', function () {
   });
 
   test('handleGranted', function () {
+    // check the entities are not in the store
+    assert.entityCount('Administrator', 0);
+    assert.entityCount('AdministratorAdminPlugin', 0);
+
+    // create the event and handle it
     let event = createGrantedEvent(
+      EXECUTE_PROPOSAL_PERMISSION_ID,
       DAO_ADDRESS,
       pluginEntityId,
-      adminEntityId,
-      AdminPermission
+      administratorEntityId
     );
     handleGranted(event);
 
+    // check the administrator entity
     assert.entityCount('Administrator', 1);
-    assert.fieldEquals('Administrator', adminEntityId, 'id', adminEntityId);
     assert.fieldEquals(
       'Administrator',
-      adminEntityId,
+      administratorEntityId,
+      'id',
+      administratorEntityId
+    );
+    assert.fieldEquals(
+      'Administrator',
+      administratorEntityId,
       'address',
-      adminEntityId
+      administratorEntityId
     );
 
+    // check the mapping with the admin pluging entity
     assert.entityCount('AdministratorAdminPlugin', 1);
-
     let administratorAdminPluginId = generateAdministratorAdminPluginEntityId(
       pluginAddress,
       adminAddress
@@ -70,7 +80,7 @@ describe('AdminMembers', function () {
       'AdministratorAdminPlugin',
       administratorAdminPluginId,
       'administrator',
-      adminEntityId
+      administratorEntityId
     );
     assert.fieldEquals(
       'AdministratorAdminPlugin',
@@ -81,8 +91,8 @@ describe('AdminMembers', function () {
   });
 
   test('handleRevoked', function () {
-    let administrator = new Administrator(adminEntityId);
-    administrator.address = adminEntityId;
+    let administrator = new Administrator(administratorEntityId);
+    administrator.address = administratorEntityId;
     administrator.save();
 
     let administratorAdminPluginId = generateAdministratorAdminPluginEntityId(
@@ -92,20 +102,26 @@ describe('AdminMembers', function () {
     let administratorAdminPluginEntity = new AdministratorAdminPlugin(
       administratorAdminPluginId
     );
-    administratorAdminPluginEntity.administrator = ADDRESS_TWO;
-    administratorAdminPluginEntity.plugin = ADDRESS_ONE;
+    administratorAdminPluginEntity.administrator = administratorEntityId;
+    administratorAdminPluginEntity.plugin = pluginEntityId;
     administratorAdminPluginEntity.save();
 
-    let revokedEvent = createRevokedEvent(
-      DAO_ADDRESS,
-      adminEntityId,
-      pluginEntityId,
-      AdminPermission
-    );
+    // check the entities are in the store
+    assert.entityCount('Administrator', 1);
+    assert.entityCount('AdministratorAdminPlugin', 1);
 
+    // create revoke event and handle it
+    let revokedEvent = createRevokedEvent(
+      EXECUTE_PROPOSAL_PERMISSION_ID,
+      DAO_ADDRESS,
+      pluginEntityId,
+      administratorEntityId
+    );
     handleRevoked(revokedEvent);
 
+    // when revoking the permission the admin is not removed, only the mapping with the admin plugin
     assert.entityCount('Administrator', 1);
-    // assert.notInStore('AdministratorAdminPlugin', administratorAdminPluginId);
+    assert.entityCount('AdministratorAdminPlugin', 0);
+    assert.notInStore('AdministratorAdminPlugin', administratorAdminPluginId);
   });
 });
