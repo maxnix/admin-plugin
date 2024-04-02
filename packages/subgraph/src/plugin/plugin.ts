@@ -11,13 +11,11 @@ import {
   ProposalExecuted,
 } from '../../generated/templates/Plugin/Admin';
 import {EXECUTE_PROPOSAL_PERMISSION_HASH} from '../utils/constants';
-import {
-  generateAdministratorAdminPluginEntityId,
-  generateActionEntityId,
-} from '../utils/ids';
+import {generateAdministratorAdminPluginEntityId} from '../utils/ids';
 import {
   generatePluginEntityId,
   generateProposalEntityId,
+  generateActionEntityId,
 } from '@aragon/osx-commons-subgraph';
 import {Address, dataSource, DataSourceContext} from '@graphprotocol/graph-ts';
 
