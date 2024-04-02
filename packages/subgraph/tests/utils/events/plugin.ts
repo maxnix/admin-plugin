@@ -6,11 +6,10 @@ import {
 import {
   ProposalCreated,
   ProposalExecuted,
+  MembershipContractAnnounced,
 } from '../../../generated/templates/Plugin/Admin';
 import {
   ADDRESS_ZERO,
-  ADDRESS_ONE,
-  ADDRESS_TWO,
   STRING_DATA,
   PLUGIN_PROPOSAL_ID,
   START_DATE,
@@ -18,7 +17,6 @@ import {
   CONTRACT_ADDRESS,
   DAO_ADDRESS,
 } from '../constants';
-import {AdminMembers} from './../../../generated/templates';
 import {Address, BigInt, Bytes, ethereum} from '@graphprotocol/graph-ts';
 import {newMockEvent} from 'matchstick-as';
 
@@ -99,10 +97,10 @@ export function createProposalExecutedEvent(
 }
 
 export function createGrantedEvent(
+  permissionId: string,
   dao: string,
   plugin: string,
-  member: string,
-  permissionId: string
+  member: string
 ): Granted {
   let newGrantedEvent = changetype<Granted>(newMockEvent());
 
@@ -140,10 +138,10 @@ export function createGrantedEvent(
 }
 
 export function createRevokedEvent(
+  permissionId: string,
   dao: string,
   plugin: string,
-  member: string,
-  permissionId: string
+  member: string
 ): Revoked {
   let newRevokedEvent = changetype<Revoked>(newMockEvent());
 
@@ -173,6 +171,26 @@ export function createRevokedEvent(
   newRevokedEvent.parameters.push(whoParam);
 
   return newRevokedEvent;
+}
+
+export function createMembershipContractAnnouncedEvent(
+  definingContract: string,
+  contractAddress: Address
+): MembershipContractAnnounced {
+  let newMembershipContractAnnouncedEvent =
+    changetype<MembershipContractAnnounced>(newMockEvent());
+
+  newMembershipContractAnnouncedEvent.address = contractAddress;
+  newMembershipContractAnnouncedEvent.parameters = [];
+
+  let definingContractParam = new ethereum.EventParam(
+    'definingContract',
+    ethereum.Value.fromAddress(Address.fromString(definingContract))
+  );
+
+  newMembershipContractAnnouncedEvent.parameters.push(definingContractParam);
+
+  return newMembershipContractAnnouncedEvent;
 }
 
 // state
