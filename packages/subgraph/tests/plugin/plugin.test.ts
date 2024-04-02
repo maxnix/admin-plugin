@@ -3,7 +3,6 @@ import {
   handleProposalExecuted,
   _handleProposalCreated,
 } from '../../src/plugin/plugin';
-import {generateActionEntityId} from '../../src/utils/ids';
 import {
   ADDRESS_ONE,
   ADDRESS_TWO,
@@ -21,6 +20,7 @@ import {
   createAdminProposalState,
 } from '../utils/events/plugin';
 import {
+  generateActionEntityId,
   generatePluginEntityId,
   generateProposalEntityId,
   createDummyAction,
