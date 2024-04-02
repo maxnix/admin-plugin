@@ -10,20 +10,3 @@ export function generateAdministratorAdminPluginEntityId(
     generateEntityIdFromAddress(administratorAddress),
   ].join('_');
 }
-
-/**
- * @dev TODO: remove this function and use the one in the commons
- */
-export function generateActionEntityId(
-  caller: Address,
-  daoAddress: Address,
-  callId: string,
-  index: i32
-): string {
-  return [
-    generateEntityIdFromAddress(caller),
-    generateEntityIdFromAddress(daoAddress),
-    callId,
-    index.toString(),
-  ].join('_');
-}
