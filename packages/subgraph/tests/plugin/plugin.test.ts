@@ -178,8 +178,6 @@ describe('Plugin', () => {
         'proposal',
         proposalEntityId
       );
-
-      clearStore();
     });
   });
 
@@ -229,8 +227,6 @@ describe('Plugin', () => {
         'executionTxHash',
         event.transaction.hash.toHexString()
       );
-
-      clearStore();
     });
   });
 
