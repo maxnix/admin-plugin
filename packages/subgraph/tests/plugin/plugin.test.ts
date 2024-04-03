@@ -165,23 +165,27 @@ describe('Plugin', () => {
         ALLOW_FAILURE_MAP
       );
 
-      // check actions
+      // check action
       assert.entityCount('Action', 1);
-      const actionEntityId = generateActionEntityId(proposalEntityId, 0);
+      const actionEntityId = generateActionEntityId(
+        pluginAddress,
+        Address.fromString(DAO_ADDRESS),
+        pluginProposalId.toString(),
+        0
+      );
       const actionEntity = Action.load(actionEntityId);
-      if (actionEntity) {
-        assert.fieldEquals('Action', actionEntityId, 'id', actionEntityId);
-        assert.fieldEquals('Action', actionEntityId, 'to', ADDRESS_TWO);
-        assert.fieldEquals('Action', actionEntityId, 'value', actionValue);
-        assert.fieldEquals('Action', actionEntityId, 'data', actionData);
-        assert.fieldEquals('Action', actionEntityId, 'daoAddress', DAO_ADDRESS);
-        assert.fieldEquals(
-          'Action',
-          actionEntityId,
-          'proposal',
-          proposalEntityId
-        );
-      }
+      assert.entityCount('Action', 1);
+      assert.fieldEquals('Action', actionEntityId, 'id', actionEntityId);
+      assert.fieldEquals('Action', actionEntityId, 'to', ADDRESS_TWO);
+      assert.fieldEquals('Action', actionEntityId, 'value', actionValue);
+      assert.fieldEquals('Action', actionEntityId, 'data', actionData);
+      assert.fieldEquals('Action', actionEntityId, 'daoAddress', DAO_ADDRESS);
+      assert.fieldEquals(
+        'Action',
+        actionEntityId,
+        'proposal',
+        proposalEntityId
+      );
     });
   });
 
@@ -194,7 +198,12 @@ describe('Plugin', () => {
 
       createAdminProposalState(proposalEntityId, administratorAddress);
 
-      const actionEntityId = generateActionEntityId(proposalEntityId, 0);
+      const actionEntityId = generateActionEntityId(
+        pluginAddress,
+        Address.fromString(DAO_ADDRESS),
+        pluginProposalId.toString(),
+        0
+      );
       let action = new Action(actionEntityId);
       action.to = Address.fromString(ADDRESS_TWO);
       action.value = BigInt.fromString(actionValue);

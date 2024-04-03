@@ -77,7 +77,12 @@ export function _handleProposalCreated(
   for (let index = 0; index < actions.length; index++) {
     const action = actions[index];
 
-    const actionEntityId = generateActionEntityId(proposalEntityId, index);
+    const actionEntityId = generateActionEntityId(
+      pluginAddress,
+      Address.fromString(daoAddress),
+      pluginProposalId.toString(),
+      index
+    );
     const actionEntity = new Action(actionEntityId);
     actionEntity.to = action.to;
     actionEntity.value = action.value;
