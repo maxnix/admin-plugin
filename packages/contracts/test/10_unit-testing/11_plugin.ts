@@ -215,7 +215,7 @@ describe(PLUGIN_CONTRACT_NAME, function () {
 
       const eventName = plugin.interface.getEvent('ProposalCreated').name;
       await expect(tx).to.emit(plugin, eventName);
-      const event = await findEvent<ProposalCreatedEvent>(tx, eventName);
+      const event = findEvent<ProposalCreatedEvent>(await tx.wait(), eventName);
       expect(event.args.proposalId).to.equal(currentExpectedProposalId);
       expect(event.args.creator).to.equal(alice.address);
       expect(event.args.metadata).to.equal(dummyMetadata);
@@ -293,7 +293,7 @@ describe(PLUGIN_CONTRACT_NAME, function () {
       const eventName = plugin.interface.getEvent('ProposalCreated').name;
       await expect(tx).to.emit(plugin, eventName);
 
-      const event = await findEvent<ProposalCreatedEvent>(tx, eventName);
+      const event = findEvent<ProposalCreatedEvent>(await tx.wait(), eventName);
       expect(event.args.proposalId).to.equal(nextExpectedProposalId);
     });
 
@@ -328,8 +328,8 @@ describe(PLUGIN_CONTRACT_NAME, function () {
           .connect(alice)
           .executeProposal(dummyMetadata, dummyActions, allowFailureMap);
 
-        const event = await findEventTopicLog<DAOEvents.ExecutedEvent>(
-          tx,
+        const event = findEventTopicLog<DAOEvents.ExecutedEvent>(
+          await tx.wait(),
           dao.interface,
           dao.interface.getEvent('Executed').name
         );
@@ -351,8 +351,8 @@ describe(PLUGIN_CONTRACT_NAME, function () {
           .connect(alice)
           .executeProposal(dummyMetadata, dummyActions, 0);
 
-        const event = await findEventTopicLog<DAOEvents.ExecutedEvent>(
-          tx,
+        const event = findEventTopicLog<DAOEvents.ExecutedEvent>(
+          await tx.wait(),
           dao.interface,
           dao.interface.getEvent('Executed').name
         );
@@ -375,10 +375,7 @@ type FixtureResult = {
 
 async function fixture(): Promise<FixtureResult> {
   const [deployer, alice, bob] = await ethers.getSigners();
-
-  const dummyMetadata = ethers.utils.hexlify(
-    ethers.utils.toUtf8Bytes('0x123456789')
-  );
+  const dummyMetadata = '0x12345678';
   const dao = await createDaoProxy(deployer, dummyMetadata);
 
   const adminPluginImplementation = await new Admin__factory(deployer).deploy();
@@ -395,7 +392,7 @@ async function fixture(): Promise<FixtureResult> {
     adminPluginInitdata
   );
   const proxyCreatedEvent1 = await findEvent<ProxyCreatedEvent>(
-    deploymentTx1,
+    await deploymentTx1.wait(),
     adminProxyFactory.interface.getEvent('ProxyCreated').name
   );
   const initializedPlugin = Admin__factory.connect(
@@ -405,7 +402,7 @@ async function fixture(): Promise<FixtureResult> {
 
   const deploymentTx2 = await adminProxyFactory.deployMinimalProxy([]);
   const proxyCreatedEvent2 = await findEvent<ProxyCreatedEvent>(
-    deploymentTx2,
+    await deploymentTx2.wait(),
     adminProxyFactory.interface.getEvent('ProxyCreated').name
   );
   const uninitializedPlugin = Admin__factory.connect(
