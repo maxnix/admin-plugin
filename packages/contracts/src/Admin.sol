@@ -10,6 +10,7 @@ import {IMembership} from "@aragon/osx-commons-contracts/src/plugin/extensions/m
 import {ProposalUpgradeable} from "@aragon/osx-commons-contracts/src/plugin/extensions/proposal/ProposalUpgradeable.sol";
 import {PluginCloneable} from "@aragon/osx-commons-contracts/src/plugin/PluginCloneable.sol";
 import {IDAO} from "@aragon/osx-commons-contracts/src/dao/IDAO.sol";
+import {IProposal} from "@aragon/osx-commons-contracts/src/plugin/extensions/proposal/IProposal.sol";
 
 /// @title Admin
 /// @author Aragon X - 2022-2023
@@ -59,6 +60,38 @@ contract Admin is IMembership, PluginCloneable, ProposalUpgradeable {
             });
     }
 
+    /// @notice Hashing function used to (re)build the proposal id from the proposal details..
+    /// @dev The proposal id is produced by hashing the ABI encoded `targets` array, the `values` array, the `calldatas` array
+    /// and the descriptionHash (bytes32 which itself is the keccak256 hash of the description string). This proposal id
+    /// can be produced from the proposal data which is part of the {ProposalCreated} event. It can even be computed in
+    /// advance, before the proposal is submitted.
+    /// The chainId and the governor address are not part of the proposal id computation. Consequently, the
+    /// same proposal (with same operation and same description) will have the same id if submitted on multiple governors
+    /// across multiple networks. This also means that in order to execute the same operation twice (on the same
+    /// governor) the proposer will have to change the description in order to avoid proposal id conflicts.
+    /// @param _actions The actions that will be executed after the proposal passes.
+    /// @param _metadata The metadata of the proposal.
+    /// @return proposalId The ID of the proposal.
+    function createProposalId(
+        IDAO.Action[] calldata _actions,
+        bytes memory _metadata
+    ) public pure override returns (uint256) {
+        return uint256(keccak256(abi.encode(_actions, _metadata)));
+    }
+
+    /// @inheritdoc IProposal
+    function createProposal(
+        bytes calldata _metadata,
+        IDAO.Action[] calldata _actions,
+        uint64 _startDate,
+        uint64 _endDate
+    ) external override returns (uint256 proposalId) {}
+
+    /// @inheritdoc IProposal
+    function canExecute(uint256) public view virtual override returns (bool) {
+        return true;
+    }
+
     /// @notice Creates and executes a new proposal.
     /// @param _metadata The metadata of the proposal.
     /// @param _actions The actions to be executed.
@@ -70,16 +103,8 @@ contract Admin is IMembership, PluginCloneable, ProposalUpgradeable {
         IDAO.Action[] calldata _actions,
         uint256 _allowFailureMap
     ) external auth(EXECUTE_PROPOSAL_PERMISSION_ID) {
-        uint64 currentTimestamp64 = block.timestamp.toUint64();
+        uint256 proposalId = createProposalId(_actions, _metadata);
 
-        uint256 proposalId = _createProposal({
-            _creator: _msgSender(),
-            _metadata: _metadata,
-            _startDate: currentTimestamp64,
-            _endDate: currentTimestamp64,
-            _actions: _actions,
-            _allowFailureMap: _allowFailureMap
-        });
-        _executeProposal(dao(), proposalId, _actions, _allowFailureMap);
+        _execute(address(dao()), bytes32(proposalId), _actions, _allowFailureMap, Operation.Call);
     }
 }
