@@ -8,7 +8,7 @@ import {IMembership} from "@aragon/osx-commons-contracts/src/plugin/extensions/m
 
 // solhint-disable-next-line max-line-length
 import {ProposalUpgradeable} from "@aragon/osx-commons-contracts/src/plugin/extensions/proposal/ProposalUpgradeable.sol";
-import {PluginCloneable} from "@aragon/osx-commons-contracts/src/plugin/PluginCloneable.sol";
+import {PluginUUPSUpgradeable} from "@aragon/osx-commons-contracts/src/plugin/PluginUUPSUpgradeable.sol";
 import {IDAO} from "@aragon/osx-commons-contracts/src/dao/IDAO.sol";
 import {IProposal} from "@aragon/osx-commons-contracts/src/plugin/extensions/proposal/IProposal.sol";
 
@@ -17,7 +17,7 @@ import {IProposal} from "@aragon/osx-commons-contracts/src/plugin/extensions/pro
 /// @notice The admin governance plugin giving execution permission on the DAO to a single address.
 /// @dev v1.2 (Release 1, Build 2)
 /// @custom:security-contact sirt@aragon.org
-contract Admin is IMembership, PluginCloneable, ProposalUpgradeable {
+contract Admin is IMembership, PluginUUPSUpgradeable, ProposalUpgradeable {
     using SafeCastUpgradeable for uint256;
 
     /// @notice The [ERC-165](https://eips.ethereum.org/EIPS/eip-165) interface ID of the contract.
@@ -34,7 +34,7 @@ contract Admin is IMembership, PluginCloneable, ProposalUpgradeable {
     /// @param _dao The associated DAO.
     /// @dev This method is required to support [ERC-1167](https://eips.ethereum.org/EIPS/eip-1167).
     function initialize(IDAO _dao, TargetConfig calldata _targetConfig) external initializer {
-        __PluginCloneable_init(_dao);
+        __PluginUUPSUpgradeable_init(_dao);
 
         _setTargetConfig(_targetConfig);
 
@@ -46,7 +46,7 @@ contract Admin is IMembership, PluginCloneable, ProposalUpgradeable {
     /// @return Returns `true` if the interface is supported.
     function supportsInterface(
         bytes4 _interfaceId
-    ) public view override(PluginCloneable, ProposalUpgradeable) returns (bool) {
+    ) public view override(PluginUUPSUpgradeable, ProposalUpgradeable) returns (bool) {
         return
             _interfaceId == ADMIN_INTERFACE_ID ||
             _interfaceId == type(IMembership).interfaceId ||
@@ -141,5 +141,13 @@ contract Admin is IMembership, PluginCloneable, ProposalUpgradeable {
         );
 
         emit ProposalExecuted(proposalId);
+    }
+
+    /// @notice Internal method authorizing the upgrade of the contract via the [upgradeability mechanism for UUPS proxies](https://docs.openzeppelin.com/contracts/4.x/api/proxy#UUPSUpgradeable) (see [ERC-1822](https://eips.ethereum.org/EIPS/eip-1822)).
+    /// @dev The Upgradeability disabled.
+    function _authorizeUpgrade(
+        address
+    ) internal virtual override auth(UPGRADE_PLUGIN_PERMISSION_ID) {
+        revert NotAllowedOperation();
     }
 }
