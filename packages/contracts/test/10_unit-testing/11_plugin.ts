@@ -15,6 +15,8 @@ import {ProposalCreatedEvent} from '../../typechain/src/Admin';
 import {
   ADMIN_INTERFACE,
   EXECUTE_PROPOSAL_PERMISSION_ID,
+  Operation,
+  TargetConfig,
 } from '../admin-constants';
 import {
   findEvent,
@@ -32,15 +34,23 @@ import {ethers} from 'hardhat';
 describe(PLUGIN_CONTRACT_NAME, function () {
   describe('initialize', async () => {
     it('reverts if trying to re-initialize', async () => {
-      const {initializedPlugin: plugin, dao} = await loadFixture(fixture);
-      await expect(plugin.initialize(dao.address)).to.be.revertedWith(
-        'Initializable: contract is already initialized'
-      );
+      const {
+        initializedPlugin: plugin,
+        dao,
+        targetConfig,
+      } = await loadFixture(fixture);
+      await expect(
+        plugin.initialize(dao.address, targetConfig)
+      ).to.be.revertedWith('Initializable: contract is already initialized');
     });
 
     it('emits the `MembershipContractAnnounced` event', async () => {
-      const {uninitializedPlugin: plugin, dao} = await loadFixture(fixture);
-      await expect(plugin.initialize(dao.address))
+      const {
+        uninitializedPlugin: plugin,
+        dao,
+        targetConfig,
+      } = await loadFixture(fixture);
+      await expect(plugin.initialize(dao.address, targetConfig))
         .to.emit(
           plugin,
           plugin.interface.getEvent('MembershipContractAnnounced').name
@@ -205,7 +215,10 @@ describe(PLUGIN_CONTRACT_NAME, function () {
         DAO_PERMISSIONS.EXECUTE_PERMISSION_ID
       );
 
-      const currentExpectedProposalId = 0;
+      const currentExpectedProposalId = await plugin.createProposalId(
+        dummyActions,
+        dummyMetadata
+      );
 
       const allowFailureMap = 1;
 
@@ -248,53 +261,16 @@ describe(PLUGIN_CONTRACT_NAME, function () {
         DAO_PERMISSIONS.EXECUTE_PERMISSION_ID
       );
 
-      const currentExpectedProposalId = 0;
+      const currentExpectedProposalId = await plugin.createProposalId(
+        dummyActions,
+        dummyMetadata
+      );
 
       await expect(
         plugin.connect(alice).executeProposal(dummyMetadata, dummyActions, 0)
       )
         .to.emit(plugin, plugin.interface.getEvent('ProposalExecuted').name)
         .withArgs(currentExpectedProposalId);
-    });
-
-    it('correctly increments the proposal ID', async () => {
-      const {
-        alice,
-        initializedPlugin: plugin,
-        dao,
-        dummyActions,
-        dummyMetadata,
-      } = await loadFixture(fixture);
-      // Grant Alice the `EXECUTE_PROPOSAL_PERMISSION_ID` permission on the Admin plugin
-      await dao.grant(
-        plugin.address,
-        alice.address,
-        EXECUTE_PROPOSAL_PERMISSION_ID
-      );
-      // Grant the Admin plugin the `EXECUTE_PERMISSION_ID` permission on the DAO
-      await dao.grant(
-        dao.address,
-        plugin.address,
-        DAO_PERMISSIONS.EXECUTE_PERMISSION_ID
-      );
-
-      const currentExpectedProposalId = 0;
-
-      await plugin
-        .connect(alice)
-        .executeProposal(dummyMetadata, dummyActions, 0);
-
-      const nextExpectedProposalId = currentExpectedProposalId + 1;
-
-      const tx = await plugin
-        .connect(alice)
-        .executeProposal(dummyMetadata, dummyActions, 0);
-
-      const eventName = plugin.interface.getEvent('ProposalCreated').name;
-      await expect(tx).to.emit(plugin, eventName);
-
-      const event = findEvent<ProposalCreatedEvent>(await tx.wait(), eventName);
-      expect(event.args.proposalId).to.equal(nextExpectedProposalId);
     });
 
     it("calls the DAO's execute function using the proposal ID as the call ID", async () => {
@@ -321,7 +297,11 @@ describe(PLUGIN_CONTRACT_NAME, function () {
 
       const newPlugin = plugin.connect(alice);
       {
-        const proposalId = 0;
+        const proposalId = await plugin.createProposalId(
+          dummyActions,
+          dummyMetadata
+        );
+
         const allowFailureMap = 1;
 
         const tx = await newPlugin
@@ -335,7 +315,7 @@ describe(PLUGIN_CONTRACT_NAME, function () {
         );
 
         expect(event.args.actor).to.equal(plugin.address);
-        expect(event.args.callId).to.equal(proposalIdToBytes32(proposalId));
+        expect(event.args.callId).to.equal(proposalId);
         expect(event.args.actions.length).to.equal(1);
         expect(event.args.actions[0].to).to.equal(dummyActions[0].to);
         expect(event.args.actions[0].value).to.equal(dummyActions[0].value);
@@ -345,18 +325,23 @@ describe(PLUGIN_CONTRACT_NAME, function () {
       }
 
       {
-        const proposalId = 1;
+        const newMetadata = dummyMetadata + '11';
+
+        const proposalId = await plugin.createProposalId(
+          dummyActions,
+          newMetadata
+        );
 
         const tx = await newPlugin
           .connect(alice)
-          .executeProposal(dummyMetadata, dummyActions, 0);
+          .executeProposal(newMetadata, dummyActions, 0);
 
         const event = findEventTopicLog<DAOEvents.ExecutedEvent>(
           await tx.wait(),
           dao.interface,
           dao.interface.getEvent('Executed').name
         );
-        expect(event.args.callId).to.equal(proposalIdToBytes32(proposalId));
+        expect(event.args.callId).to.equal(proposalId);
       }
     });
   });
@@ -371,6 +356,7 @@ type FixtureResult = {
   dao: DAO;
   dummyActions: DAOStructs.ActionStruct[];
   dummyMetadata: string;
+  targetConfig: TargetConfig;
 };
 
 async function fixture(): Promise<FixtureResult> {
@@ -383,10 +369,16 @@ async function fixture(): Promise<FixtureResult> {
     adminPluginImplementation.address
   );
 
+  const targetConfig: TargetConfig = {
+    operation: Operation.call,
+    target: dao.address,
+  };
+
   // Create an initialized plugin clone
   const adminPluginInitdata =
     adminPluginImplementation.interface.encodeFunctionData('initialize', [
       dao.address,
+      targetConfig,
     ]);
   const deploymentTx1 = await adminProxyFactory.deployMinimalProxy(
     adminPluginInitdata
@@ -427,5 +419,6 @@ async function fixture(): Promise<FixtureResult> {
     dao,
     dummyActions,
     dummyMetadata,
+    targetConfig,
   };
 }

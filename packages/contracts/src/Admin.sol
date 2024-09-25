@@ -28,11 +28,15 @@ contract Admin is IMembership, PluginCloneable, ProposalUpgradeable {
     bytes32 public constant EXECUTE_PROPOSAL_PERMISSION_ID =
         keccak256("EXECUTE_PROPOSAL_PERMISSION");
 
+    error NotAllowedOperation();
+
     /// @notice Initializes the contract.
     /// @param _dao The associated DAO.
     /// @dev This method is required to support [ERC-1167](https://eips.ethereum.org/EIPS/eip-1167).
-    function initialize(IDAO _dao) external initializer {
+    function initialize(IDAO _dao, TargetConfig calldata _targetConfig) external initializer {
         __PluginCloneable_init(_dao);
+
+        _setTargetConfig(_targetConfig);
 
         emit MembershipContractAnnounced({definingContract: address(_dao)});
     }
@@ -80,12 +84,21 @@ contract Admin is IMembership, PluginCloneable, ProposalUpgradeable {
     }
 
     /// @inheritdoc IProposal
+    /// @dev Admin doesn't allow creating a proposal, so we return empty string.
+    function createProposalParamsABI() external pure override returns (string memory) {
+        return "";
+    }
+
+    /// @inheritdoc IProposal
     function createProposal(
-        bytes calldata _metadata,
-        IDAO.Action[] calldata _actions,
-        uint64 _startDate,
-        uint64 _endDate
-    ) external override returns (uint256 proposalId) {}
+        bytes calldata,
+        IDAO.Action[] calldata,
+        uint64,
+        uint64,
+        bytes memory
+    ) public pure override returns (uint256) {
+        revert NotAllowedOperation();
+    }
 
     /// @inheritdoc IProposal
     function canExecute(uint256) public view virtual override returns (bool) {
@@ -103,8 +116,30 @@ contract Admin is IMembership, PluginCloneable, ProposalUpgradeable {
         IDAO.Action[] calldata _actions,
         uint256 _allowFailureMap
     ) external auth(EXECUTE_PROPOSAL_PERMISSION_ID) {
+        uint64 currentTimestamp64 = block.timestamp.toUint64();
+
         uint256 proposalId = createProposalId(_actions, _metadata);
 
-        _execute(address(dao()), bytes32(proposalId), _actions, _allowFailureMap, Operation.Call);
+        TargetConfig memory targetConfig = getTargetConfig();
+
+        _execute(
+            targetConfig.target,
+            bytes32(proposalId),
+            _actions,
+            _allowFailureMap,
+            targetConfig.operation
+        );
+
+        emit ProposalCreated(
+            proposalId,
+            _msgSender(),
+            currentTimestamp64,
+            currentTimestamp64,
+            _metadata,
+            _actions,
+            _allowFailureMap
+        );
+
+        emit ProposalExecuted(proposalId);
     }
 }
