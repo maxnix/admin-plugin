@@ -2,7 +2,7 @@ import {ethers} from 'hardhat';
 
 export const ADMIN_INTERFACE = new ethers.utils.Interface([
   'function initialize(address,tuple(address,uint8))',
-  'function executeProposal(bytes,tuple(address,uint256,bytes)[],uint256)',
+  'function execute(bytes,tuple(address,uint256,bytes)[],uint256)',
 ]);
 
 // Permissions

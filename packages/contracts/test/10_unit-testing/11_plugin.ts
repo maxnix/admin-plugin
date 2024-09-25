@@ -123,7 +123,7 @@ describe(PLUGIN_CONTRACT_NAME, function () {
   });
 
   describe('execute proposal: ', async () => {
-    it('reverts when calling `executeProposal()` if `EXECUTE_PROPOSAL_PERMISSION_ID` is not granted to the admin address', async () => {
+    it('reverts when calling `execute()` if `EXECUTE_PROPOSAL_PERMISSION_ID` is not granted to the admin address', async () => {
       const {
         alice,
         initializedPlugin: plugin,
@@ -142,9 +142,9 @@ describe(PLUGIN_CONTRACT_NAME, function () {
         )
       ).to.be.false;
 
-      // Expect Alice's `executeProposal` call to be reverted because she hasn't `EXECUTE_PROPOSAL_PERMISSION_ID` on the Admin plugin
+      // Expect Alice's `execute` call to be reverted because she hasn't `EXECUTE_PROPOSAL_PERMISSION_ID` on the Admin plugin
       await expect(
-        plugin.connect(alice).executeProposal(dummyMetadata, dummyActions, 0)
+        plugin.connect(alice).execute(dummyMetadata, dummyActions, 0)
       )
         .to.be.revertedWithCustomError(plugin, 'DaoUnauthorized')
         .withArgs(
@@ -155,7 +155,7 @@ describe(PLUGIN_CONTRACT_NAME, function () {
         );
     });
 
-    it('reverts when calling `executeProposal()` if the `EXECUTE_PERMISSION_ID` on the DAO is not granted to the plugin address', async () => {
+    it('reverts when calling `execute()` if the `EXECUTE_PERMISSION_ID` on the DAO is not granted to the plugin address', async () => {
       const {
         alice,
         initializedPlugin: plugin,
@@ -181,9 +181,9 @@ describe(PLUGIN_CONTRACT_NAME, function () {
         )
       ).to.be.false;
 
-      // Expect Alice's  the `executeProposal` call to be reverted because the Admin plugin hasn't `EXECUTE_PERMISSION_ID` on the DAO
+      // Expect Alice's  the `execute` call to be reverted because the Admin plugin hasn't `EXECUTE_PERMISSION_ID` on the DAO
       await expect(
-        plugin.connect(alice).executeProposal(dummyMetadata, dummyActions, 0)
+        plugin.connect(alice).execute(dummyMetadata, dummyActions, 0)
       )
         .to.be.revertedWithCustomError(dao, 'Unauthorized')
         .withArgs(
@@ -224,7 +224,7 @@ describe(PLUGIN_CONTRACT_NAME, function () {
 
       const tx = await plugin
         .connect(alice)
-        .executeProposal(dummyMetadata, dummyActions, allowFailureMap);
+        .execute(dummyMetadata, dummyActions, allowFailureMap);
 
       const eventName = plugin.interface.getEvent('ProposalCreated').name;
       await expect(tx).to.emit(plugin, eventName);
@@ -267,7 +267,7 @@ describe(PLUGIN_CONTRACT_NAME, function () {
       );
 
       await expect(
-        plugin.connect(alice).executeProposal(dummyMetadata, dummyActions, 0)
+        plugin.connect(alice).execute(dummyMetadata, dummyActions, 0)
       )
         .to.emit(plugin, plugin.interface.getEvent('ProposalExecuted').name)
         .withArgs(currentExpectedProposalId);
@@ -306,7 +306,7 @@ describe(PLUGIN_CONTRACT_NAME, function () {
 
         const tx = await newPlugin
           .connect(alice)
-          .executeProposal(dummyMetadata, dummyActions, allowFailureMap);
+          .execute(dummyMetadata, dummyActions, allowFailureMap);
 
         const event = findEventTopicLog<DAOEvents.ExecutedEvent>(
           await tx.wait(),
@@ -334,7 +334,7 @@ describe(PLUGIN_CONTRACT_NAME, function () {
 
         const tx = await newPlugin
           .connect(alice)
-          .executeProposal(newMetadata, dummyActions, 0);
+          .execute(newMetadata, dummyActions, 0);
 
         const event = findEventTopicLog<DAOEvents.ExecutedEvent>(
           await tx.wait(),

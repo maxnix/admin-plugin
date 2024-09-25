@@ -21,8 +21,7 @@ contract Admin is IMembership, PluginUUPSUpgradeable, ProposalUpgradeable {
     using SafeCastUpgradeable for uint256;
 
     /// @notice The [ERC-165](https://eips.ethereum.org/EIPS/eip-165) interface ID of the contract.
-    bytes4 internal constant ADMIN_INTERFACE_ID =
-        this.initialize.selector ^ this.executeProposal.selector;
+    bytes4 internal constant ADMIN_INTERFACE_ID = this.initialize.selector ^ this.execute.selector;
 
     /// @notice The ID of the permission required to call the `executeProposal` function.
     bytes32 public constant EXECUTE_PROPOSAL_PERMISSION_ID =
@@ -86,18 +85,24 @@ contract Admin is IMembership, PluginUUPSUpgradeable, ProposalUpgradeable {
     /// @inheritdoc IProposal
     /// @dev Admin doesn't allow creating a proposal, so we return empty string.
     function createProposalParamsABI() external pure override returns (string memory) {
-        return "";
+        return "(uint256 allowFailureMap)";
     }
 
     /// @inheritdoc IProposal
     function createProposal(
-        bytes calldata,
-        IDAO.Action[] calldata,
+        bytes calldata _metadata,
+        IDAO.Action[] calldata _actions,
         uint64,
         uint64,
-        bytes memory
-    ) public pure override returns (uint256) {
-        revert NotAllowedOperation();
+        bytes memory _data
+    ) public override returns (uint256) {
+        uint256 allowFailureMap;
+
+        if (_data.length > 0) {
+            allowFailureMap = abi.decode(_data, (uint256));
+        }
+
+        execute(_metadata, _actions, allowFailureMap);
     }
 
     /// @inheritdoc IProposal
@@ -111,11 +116,11 @@ contract Admin is IMembership, PluginUUPSUpgradeable, ProposalUpgradeable {
     /// @param _allowFailureMap A bitmap allowing the proposal to succeed, even if individual actions might revert.
     /// If the bit at index `i` is 1, the proposal succeeds even if the `i`th action reverts. A failure map value
     // of 0 requires every action to not revert.
-    function executeProposal(
+    function execute(
         bytes calldata _metadata,
         IDAO.Action[] calldata _actions,
         uint256 _allowFailureMap
-    ) external auth(EXECUTE_PROPOSAL_PERMISSION_ID) {
+    ) public auth(EXECUTE_PROPOSAL_PERMISSION_ID) {
         uint64 currentTimestamp64 = block.timestamp.toUint64();
 
         uint256 proposalId = createProposalId(_actions, _metadata);
