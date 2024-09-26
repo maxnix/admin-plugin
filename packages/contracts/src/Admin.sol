@@ -11,6 +11,7 @@ import {ProposalUpgradeable} from "@aragon/osx-commons-contracts/src/plugin/exte
 import {PluginUUPSUpgradeable} from "@aragon/osx-commons-contracts/src/plugin/PluginUUPSUpgradeable.sol";
 import {IDAO} from "@aragon/osx-commons-contracts/src/dao/IDAO.sol";
 import {IProposal} from "@aragon/osx-commons-contracts/src/plugin/extensions/proposal/IProposal.sol";
+import {IExecutor} from "@aragon/osx-commons-contracts/src/executors/IExecutor.sol";
 
 /// @title Admin
 /// @author Aragon X - 2022-2023
@@ -76,7 +77,7 @@ contract Admin is IMembership, PluginUUPSUpgradeable, ProposalUpgradeable {
     /// @param _metadata The metadata of the proposal.
     /// @return proposalId The ID of the proposal.
     function createProposalId(
-        IDAO.Action[] calldata _actions,
+        IExecutor.Action[] calldata _actions,
         bytes memory _metadata
     ) public pure override returns (uint256) {
         return uint256(keccak256(abi.encode(_actions, _metadata)));
@@ -91,7 +92,7 @@ contract Admin is IMembership, PluginUUPSUpgradeable, ProposalUpgradeable {
     /// @inheritdoc IProposal
     function createProposal(
         bytes calldata _metadata,
-        IDAO.Action[] calldata _actions,
+        IExecutor.Action[] calldata _actions,
         uint64,
         uint64,
         bytes memory _data
@@ -119,7 +120,7 @@ contract Admin is IMembership, PluginUUPSUpgradeable, ProposalUpgradeable {
     // of 0 requires every action to not revert.
     function execute(
         bytes calldata _metadata,
-        IDAO.Action[] calldata _actions,
+        IExecutor.Action[] calldata _actions,
         uint256 _allowFailureMap
     ) public auth(EXECUTE_PROPOSAL_PERMISSION_ID) {
         uint64 currentTimestamp64 = block.timestamp.toUint64();
