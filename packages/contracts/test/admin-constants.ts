@@ -10,6 +10,10 @@ export const EXECUTE_PROPOSAL_PERMISSION_ID = ethers.utils.id(
   'EXECUTE_PROPOSAL_PERMISSION'
 );
 
+export const SET_TARGET_CONFIG_PERMISSION_ID = ethers.utils.id(
+  'SET_TARGET_CONFIG_PERMISSION'
+);
+
 export enum Operation {
   call,
   delegatecall,

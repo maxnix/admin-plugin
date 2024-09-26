@@ -3,6 +3,7 @@ import {PLUGIN_CONTRACT_NAME} from '../../plugin-settings';
 import {
   Admin,
   Admin__factory,
+  CustomExecutorMock__factory,
   IERC165Upgradeable__factory,
   IMembership__factory,
   IPlugin__factory,
@@ -16,6 +17,7 @@ import {
   ADMIN_INTERFACE,
   EXECUTE_PROPOSAL_PERMISSION_ID,
   Operation,
+  SET_TARGET_CONFIG_PERMISSION_ID,
   TargetConfig,
 } from '../admin-constants';
 import {
@@ -343,6 +345,85 @@ describe(PLUGIN_CONTRACT_NAME, function () {
         );
         expect(event.args.callId).to.equal(proposalId);
       }
+    });
+
+    it('calls executeProposal within createProposal', async () => {
+      const {
+        alice,
+        dummyMetadata,
+        dummyActions,
+        dao,
+        initializedPlugin: plugin,
+      } = await loadFixture(fixture);
+
+      // Grant Alice the `EXECUTE_PROPOSAL_PERMISSION_ID` permission on the Admin plugin
+      await dao.grant(
+        plugin.address,
+        alice.address,
+        EXECUTE_PROPOSAL_PERMISSION_ID
+      );
+
+      // Grant the Admin plugin the `EXECUTE_PERMISSION_ID` permission on the DAO
+      await dao.grant(
+        dao.address,
+        plugin.address,
+        DAO_PERMISSIONS.EXECUTE_PERMISSION_ID
+      );
+
+      await expect(
+        plugin
+          .connect(alice)
+          .createProposal(dummyMetadata, dummyActions, 0, 0, '0x')
+      ).to.emit(plugin, 'ProposalExecuted');
+    });
+
+    it('executes target with delegate call', async () => {
+      const {
+        alice,
+        bob,
+        dummyMetadata,
+        dummyActions,
+        deployer,
+        dao,
+        initializedPlugin: plugin,
+      } = await loadFixture(fixture);
+
+      const executorFactory = new CustomExecutorMock__factory(deployer);
+      const executor = await executorFactory.deploy();
+
+      const abiA = CustomExecutorMock__factory.abi;
+      const abiB = Admin__factory.abi;
+      // @ts-ignore
+      const mergedABI = abiA.concat(abiB);
+
+      await dao.grant(
+        plugin.address,
+        deployer.address,
+        SET_TARGET_CONFIG_PERMISSION_ID
+      );
+
+      await plugin.connect(deployer).setTargetConfig({
+        target: executor.address,
+        operation: Operation.delegatecall,
+      });
+
+      const pluginMerged = (await ethers.getContractAt(
+        mergedABI,
+        plugin.address
+      )) as Admin;
+
+      // Grant Alice the `EXECUTE_PROPOSAL_PERMISSION_ID` permission on the Admin plugin
+      await dao.grant(
+        plugin.address,
+        alice.address,
+        EXECUTE_PROPOSAL_PERMISSION_ID
+      );
+
+      await expect(
+        plugin.connect(alice).execute(dummyMetadata, dummyActions, 1)
+      )
+        .to.emit(pluginMerged, 'ExecutedCustom')
+        .to.emit(pluginMerged, 'ProposalExecuted');
     });
   });
 });

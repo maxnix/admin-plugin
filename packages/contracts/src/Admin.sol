@@ -102,6 +102,7 @@ contract Admin is IMembership, PluginUUPSUpgradeable, ProposalUpgradeable {
             allowFailureMap = abi.decode(_data, (uint256));
         }
 
+        // Uses public function for permission check.
         execute(_metadata, _actions, allowFailureMap);
     }
 
