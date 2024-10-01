@@ -11,7 +11,7 @@ import {ProposalUpgradeable} from "@aragon/osx-commons-contracts/src/plugin/exte
 import {PluginCloneable} from "@aragon/osx-commons-contracts/src/plugin/PluginCloneable.sol";
 import {IDAO} from "@aragon/osx-commons-contracts/src/dao/IDAO.sol";
 import {IProposal} from "@aragon/osx-commons-contracts/src/plugin/extensions/proposal/IProposal.sol";
-import {IExecutor, Action} from "@aragon/osx-commons-contracts/src/executors/IExecutor.sol";
+import {Action} from "@aragon/osx-commons-contracts/src/executors/IExecutor.sol";
 
 /// @title Admin
 /// @author Aragon X - 2022-2023
@@ -22,13 +22,11 @@ contract Admin is IMembership, PluginCloneable, ProposalUpgradeable {
     using SafeCastUpgradeable for uint256;
 
     /// @notice The [ERC-165](https://eips.ethereum.org/EIPS/eip-165) interface ID of the contract.
-    bytes4 internal constant ADMIN_INTERFACE_ID = this.initialize.selector ^ this.execute.selector;
+    bytes4 internal constant ADMIN_INTERFACE_ID = this.executeProposal.selector;
 
     /// @notice The ID of the permission required to call the `executeProposal` function.
     bytes32 public constant EXECUTE_PROPOSAL_PERMISSION_ID =
         keccak256("EXECUTE_PROPOSAL_PERMISSION");
-
-    error NotAllowedOperation();
 
     /// @notice Initializes the contract.
     /// @param _dao The associated DAO.
@@ -96,7 +94,7 @@ contract Admin is IMembership, PluginCloneable, ProposalUpgradeable {
         uint64,
         uint64,
         bytes memory _data
-    ) public override returns (uint256) {
+    ) public override returns (uint256 proposalId) {
         uint256 allowFailureMap;
 
         if (_data.length > 0) {
@@ -104,7 +102,7 @@ contract Admin is IMembership, PluginCloneable, ProposalUpgradeable {
         }
 
         // Uses public function for permission check.
-        execute(_metadata, _actions, allowFailureMap);
+        proposalId = executeProposal(_metadata, _actions, allowFailureMap);
     }
 
     /// @inheritdoc IProposal
@@ -118,14 +116,14 @@ contract Admin is IMembership, PluginCloneable, ProposalUpgradeable {
     /// @param _allowFailureMap A bitmap allowing the proposal to succeed, even if individual actions might revert.
     /// If the bit at index `i` is 1, the proposal succeeds even if the `i`th action reverts. A failure map value
     // of 0 requires every action to not revert.
-    function execute(
+    function executeProposal(
         bytes calldata _metadata,
         Action[] calldata _actions,
         uint256 _allowFailureMap
-    ) public auth(EXECUTE_PROPOSAL_PERMISSION_ID) {
-        uint64 currentTimestamp64 = block.timestamp.toUint64();
+    ) public auth(EXECUTE_PROPOSAL_PERMISSION_ID) returns (uint256 proposalId) {
+        uint64 currentTimestamp = block.timestamp.toUint64();
 
-        uint256 proposalId = createProposalId(_actions, _metadata);
+        proposalId = createProposalId(_actions, _metadata);
 
         TargetConfig memory targetConfig = getTargetConfig();
 
@@ -140,8 +138,8 @@ contract Admin is IMembership, PluginCloneable, ProposalUpgradeable {
         emit ProposalCreated(
             proposalId,
             _msgSender(),
-            currentTimestamp64,
-            currentTimestamp64,
+            currentTimestamp,
+            currentTimestamp,
             _metadata,
             _actions,
             _allowFailureMap

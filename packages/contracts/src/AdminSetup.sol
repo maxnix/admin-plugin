@@ -19,9 +19,12 @@ import {Admin} from "./Admin.sol";
 contract AdminSetup is PluginSetup {
     using ProxyLib for address;
 
-    // TODO This permission identifier has to be moved inside `PermissionLib` as per task OS-954.
     /// @notice The ID of the permission required to call the `execute` function.
     bytes32 internal constant EXECUTE_PERMISSION_ID = keccak256("EXECUTE_PERMISSION");
+
+    /// @notice The ID of the permission required to call the `executeProposal` function.
+    bytes32 public constant EXECUTE_PROPOSAL_PERMISSION_ID =
+        keccak256("EXECUTE_PROPOSAL_PERMISSION");
 
     /// @notice Thrown if the admin address is zero.
     /// @param admin The admin address.
@@ -59,7 +62,7 @@ contract AdminSetup is PluginSetup {
             where: plugin,
             who: admin,
             condition: PermissionLib.NO_CONDITION,
-            permissionId: Admin(plugin).EXECUTE_PROPOSAL_PERMISSION_ID()
+            permissionId: EXECUTE_PROPOSAL_PERMISSION_ID
         });
 
         // Grant `EXECUTE_PERMISSION` on the DAO to the plugin.
