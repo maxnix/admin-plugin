@@ -31,9 +31,33 @@ import {DAO, DAOEvents, DAOStructs} from '@aragon/osx-ethers';
 import {loadFixture} from '@nomicfoundation/hardhat-network-helpers';
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers';
 import {expect} from 'chai';
+import {BigNumber} from 'ethers';
 import {ethers} from 'hardhat';
 
+let chainId: number;
+
+async function createProposalId(pluginAddress: string, metadata: string) {
+  let blockNumber = (await ethers.provider.getBlock('latest')).number;
+  return BigNumber.from(
+    ethers.utils.keccak256(
+      ethers.utils.defaultAbiCoder.encode(
+        ['uint256', 'uint256', 'address', 'bytes32'],
+        [
+          chainId,
+          blockNumber + 1,
+          pluginAddress,
+          ethers.utils.keccak256(metadata),
+        ]
+      )
+    )
+  );
+}
+
 describe(PLUGIN_CONTRACT_NAME, function () {
+  before(async () => {
+    chainId = (await ethers.provider.getNetwork()).chainId;
+  });
+
   describe('initialize', async () => {
     it('reverts if trying to re-initialize', async () => {
       const {
@@ -217,8 +241,8 @@ describe(PLUGIN_CONTRACT_NAME, function () {
         DAO_PERMISSIONS.EXECUTE_PERMISSION_ID
       );
 
-      const currentExpectedProposalId = await plugin.createProposalId(
-        dummyActions,
+      const currentExpectedProposalId = await createProposalId(
+        plugin.address,
         dummyMetadata
       );
 
@@ -263,8 +287,8 @@ describe(PLUGIN_CONTRACT_NAME, function () {
         DAO_PERMISSIONS.EXECUTE_PERMISSION_ID
       );
 
-      const currentExpectedProposalId = await plugin.createProposalId(
-        dummyActions,
+      const currentExpectedProposalId = await createProposalId(
+        plugin.address,
         dummyMetadata
       );
 
@@ -299,8 +323,8 @@ describe(PLUGIN_CONTRACT_NAME, function () {
 
       const newPlugin = plugin.connect(alice);
       {
-        const proposalId = await plugin.createProposalId(
-          dummyActions,
+        const proposalId = await createProposalId(
+          plugin.address,
           dummyMetadata
         );
 
@@ -329,10 +353,7 @@ describe(PLUGIN_CONTRACT_NAME, function () {
       {
         const newMetadata = dummyMetadata + '11';
 
-        const proposalId = await plugin.createProposalId(
-          dummyActions,
-          newMetadata
-        );
+        const proposalId = await createProposalId(plugin.address, newMetadata);
 
         const tx = await newPlugin
           .connect(alice)
