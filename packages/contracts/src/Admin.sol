@@ -104,7 +104,7 @@ contract Admin is IMembership, PluginCloneable, ProposalUpgradeable {
     ) public auth(EXECUTE_PROPOSAL_PERMISSION_ID) returns (uint256 proposalId) {
         uint64 currentTimestamp = block.timestamp.toUint64();
 
-        proposalId = _createProposalId(keccak256(_metadata));
+        proposalId = _createProposalId(keccak256(abi.encode(_actions, _metadata)));
 
         TargetConfig memory targetConfig = getTargetConfig();
 

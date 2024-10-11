@@ -31,25 +31,28 @@ import {loadFixture} from '@nomicfoundation/hardhat-network-helpers';
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers';
 import {expect} from 'chai';
 import {BigNumber} from 'ethers';
+import {defaultAbiCoder, keccak256} from 'ethers/lib/utils';
 import {ethers} from 'hardhat';
 
 let chainId: number;
 
 async function createProposalId(
   pluginAddress: string,
+  actions: DAOStructs.ActionStruct[],
   metadata: string
 ): Promise<BigNumber> {
   const blockNumber = (await ethers.provider.getBlock('latest')).number;
+  const salt = keccak256(
+    defaultAbiCoder.encode(
+      ['tuple(address to,uint256 value,bytes data)[]', 'bytes'],
+      [actions, metadata]
+    )
+  );
   return BigNumber.from(
-    ethers.utils.keccak256(
-      ethers.utils.defaultAbiCoder.encode(
+    keccak256(
+      defaultAbiCoder.encode(
         ['uint256', 'uint256', 'address', 'bytes32'],
-        [
-          chainId,
-          blockNumber + 1,
-          pluginAddress,
-          ethers.utils.keccak256(metadata),
-        ]
+        [chainId, blockNumber + 1, pluginAddress, salt]
       )
     )
   );
@@ -245,6 +248,7 @@ describe(PLUGIN_CONTRACT_NAME, function () {
 
       const currentExpectedProposalId = await createProposalId(
         plugin.address,
+        dummyActions,
         dummyMetadata
       );
 
@@ -291,6 +295,7 @@ describe(PLUGIN_CONTRACT_NAME, function () {
 
       const currentExpectedProposalId = await createProposalId(
         plugin.address,
+        dummyActions,
         dummyMetadata
       );
 
@@ -327,6 +332,7 @@ describe(PLUGIN_CONTRACT_NAME, function () {
       {
         const proposalId = await createProposalId(
           plugin.address,
+          dummyActions,
           dummyMetadata
         );
 
@@ -355,7 +361,11 @@ describe(PLUGIN_CONTRACT_NAME, function () {
       {
         const newMetadata = dummyMetadata + '11';
 
-        const proposalId = await createProposalId(plugin.address, newMetadata);
+        const proposalId = await createProposalId(
+          plugin.address,
+          dummyActions,
+          newMetadata
+        );
 
         const tx = await newPlugin
           .connect(alice)
