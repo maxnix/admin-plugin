@@ -23,7 +23,6 @@ import {
 import {
   findEvent,
   findEventTopicLog,
-  proposalIdToBytes32,
   getInterfaceId,
   DAO_PERMISSIONS,
 } from '@aragon/osx-commons-sdk';
@@ -31,9 +30,39 @@ import {DAO, DAOEvents, DAOStructs} from '@aragon/osx-ethers';
 import {loadFixture} from '@nomicfoundation/hardhat-network-helpers';
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers';
 import {expect} from 'chai';
+import {BigNumber} from 'ethers';
+import {defaultAbiCoder, keccak256} from 'ethers/lib/utils';
 import {ethers} from 'hardhat';
 
+let chainId: number;
+
+async function createProposalId(
+  pluginAddress: string,
+  actions: DAOStructs.ActionStruct[],
+  metadata: string
+): Promise<BigNumber> {
+  const blockNumber = (await ethers.provider.getBlock('latest')).number;
+  const salt = keccak256(
+    defaultAbiCoder.encode(
+      ['tuple(address to,uint256 value,bytes data)[]', 'bytes'],
+      [actions, metadata]
+    )
+  );
+  return BigNumber.from(
+    keccak256(
+      defaultAbiCoder.encode(
+        ['uint256', 'uint256', 'address', 'bytes32'],
+        [chainId, blockNumber + 1, pluginAddress, salt]
+      )
+    )
+  );
+}
+
 describe(PLUGIN_CONTRACT_NAME, function () {
+  before(async () => {
+    chainId = (await ethers.provider.getNetwork()).chainId;
+  });
+
   describe('initialize', async () => {
     it('reverts if trying to re-initialize', async () => {
       const {
@@ -217,7 +246,8 @@ describe(PLUGIN_CONTRACT_NAME, function () {
         DAO_PERMISSIONS.EXECUTE_PERMISSION_ID
       );
 
-      const currentExpectedProposalId = await plugin.createProposalId(
+      const currentExpectedProposalId = await createProposalId(
+        plugin.address,
         dummyActions,
         dummyMetadata
       );
@@ -263,7 +293,8 @@ describe(PLUGIN_CONTRACT_NAME, function () {
         DAO_PERMISSIONS.EXECUTE_PERMISSION_ID
       );
 
-      const currentExpectedProposalId = await plugin.createProposalId(
+      const currentExpectedProposalId = await createProposalId(
+        plugin.address,
         dummyActions,
         dummyMetadata
       );
@@ -299,7 +330,8 @@ describe(PLUGIN_CONTRACT_NAME, function () {
 
       const newPlugin = plugin.connect(alice);
       {
-        const proposalId = await plugin.createProposalId(
+        const proposalId = await createProposalId(
+          plugin.address,
           dummyActions,
           dummyMetadata
         );
@@ -329,7 +361,8 @@ describe(PLUGIN_CONTRACT_NAME, function () {
       {
         const newMetadata = dummyMetadata + '11';
 
-        const proposalId = await plugin.createProposalId(
+        const proposalId = await createProposalId(
+          plugin.address,
           dummyActions,
           newMetadata
         );

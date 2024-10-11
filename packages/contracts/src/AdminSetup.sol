@@ -7,7 +7,7 @@ import {PluginSetup} from "@aragon/osx-commons-contracts/src/plugin/setup/Plugin
 import {PermissionLib} from "@aragon/osx-commons-contracts/src/permission/PermissionLib.sol";
 import {ProxyLib} from "@aragon/osx-commons-contracts/src/utils/deployment/ProxyLib.sol";
 import {IDAO} from "@aragon/osx-commons-contracts/src/dao/IDAO.sol";
-import {PluginCloneable} from "@aragon/osx-commons-contracts/src/plugin/PluginCloneable.sol";
+import {IPlugin} from "@aragon/osx-commons-contracts/src/plugin/IPlugin.sol";
 
 import {Admin} from "./Admin.sol";
 
@@ -39,9 +39,9 @@ contract AdminSetup is PluginSetup {
         bytes calldata _data
     ) external returns (address plugin, PreparedSetupData memory preparedSetupData) {
         // Decode `_data` to extract the params needed for cloning and initializing the `Admin` plugin.
-        (address admin, PluginCloneable.TargetConfig memory targetConfig) = abi.decode(
+        (address admin, IPlugin.TargetConfig memory targetConfig) = abi.decode(
             _data,
-            (address, PluginCloneable.TargetConfig)
+            (address, IPlugin.TargetConfig)
         );
 
         if (admin == address(0)) {
