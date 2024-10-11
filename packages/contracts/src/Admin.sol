@@ -63,8 +63,7 @@ contract Admin is IMembership, PluginCloneable, ProposalUpgradeable {
     }
 
     /// @inheritdoc IProposal
-    /// @dev Admin doesn't allow creating a proposal, so we return empty string.
-    function createProposalParamsABI() external pure override returns (string memory) {
+    function customProposalParamsABI() external pure override returns (string memory) {
         return "(uint256 allowFailureMap)";
     }
 
