@@ -86,7 +86,7 @@ contract Admin is IMembership, PluginCloneable, ProposalUpgradeable {
     }
 
     /// @inheritdoc IProposal
-    function canExecute(uint256) public view virtual override returns (bool) {
+    function hasSucceeded(uint256) public view virtual override returns (bool) {
         return true;
     }
 
