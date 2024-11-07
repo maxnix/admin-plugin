@@ -59,7 +59,7 @@ export function pluginEnsDomain(hre: HardhatRuntimeEnvironment): string {
   if (network === null) {
     throw new UnsupportedNetworkError(getProductionNetworkName(hre));
   }
- 
+
   const pluginEnsDomain = getPluginEnsDomain(network);
   return `${PLUGIN_REPO_ENS_SUBDOMAIN_NAME}.${pluginEnsDomain}`;
 }
