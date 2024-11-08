@@ -413,7 +413,6 @@ describe(PLUGIN_CONTRACT_NAME, function () {
     it('executes target with delegate call', async () => {
       const {
         alice,
-        bob,
         dummyMetadata,
         dummyActions,
         deployer,
@@ -426,7 +425,6 @@ describe(PLUGIN_CONTRACT_NAME, function () {
 
       const abiA = CustomExecutorMock__factory.abi;
       const abiB = Admin__factory.abi;
-      // @ts-ignore
       const mergedABI = abiA.concat(abiB);
 
       await dao.grant(
