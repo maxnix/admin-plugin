@@ -10,6 +10,8 @@ and this project adheres to the [Aragon OSx Plugin Versioning Convention](https:
 ### Added
 
 - Copied files from [aragon/osx commit 1130df](https://github.com/aragon/osx/commit/1130dfce94fd294c4341e91a8f3faccc54cf43b7)
+- `hasSucceeded`, `createProposal`, `customProposalParamsABI`, `canExecute` and `execute` function according to `IProposal` interface. 
+- `initialize` function also receives `TargetConfig` with the optional target config. 
 
 ### Changed
 
