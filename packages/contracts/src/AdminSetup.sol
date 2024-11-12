@@ -12,7 +12,7 @@ import {IPlugin} from "@aragon/osx-commons-contracts/src/plugin/IPlugin.sol";
 import {Admin} from "./Admin.sol";
 
 /// @title AdminAddressSetup
-/// @author Aragon X - 2022-2023
+/// @author Aragon X - 2022-2024
 /// @notice The setup contract of the `Admin` plugin.
 /// @dev v1.2 (Release 1, Build 2)
 /// @custom:security-contact sirt@aragon.org
@@ -79,7 +79,7 @@ contract AdminSetup is PluginSetup {
 
     /// @inheritdoc IPluginSetup
     /// @dev Currently, there is no reliable way to revoke the `ADMIN_EXECUTE_PERMISSION_ID` from all addresses
-    /// it has been granted to. Accordingly, only the `EXECUTE_PERMISSION_ID` is revoked for this uninstallation.
+    ///     it has been granted to. Accordingly, only the `EXECUTE_PERMISSION_ID` is revoked for this uninstallation.
     function prepareUninstallation(
         address _dao,
         SetupPayload calldata _payload
