@@ -30,6 +30,9 @@ contract Admin is IMembership, PluginCloneable, ProposalUpgradeable {
 
     /// @notice Initializes the contract.
     /// @param _dao The associated DAO.
+    /// @param _targetConfig Configuration for the execution target, specifying the target address and operation type
+    ///     (either `Call` or `DelegateCall`). Defined by `TargetConfig` in the `IPlugin` interface,
+    ///     part of the `osx-commons-contracts` package, added in build 2.
     /// @dev This method is required to support [ERC-1167](https://eips.ethereum.org/EIPS/eip-1167).
     function initialize(IDAO _dao, TargetConfig calldata _targetConfig) external initializer {
         __PluginCloneable_init(_dao);
