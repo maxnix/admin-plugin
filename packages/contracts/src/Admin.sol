@@ -14,7 +14,7 @@ import {IProposal} from "@aragon/osx-commons-contracts/src/plugin/extensions/pro
 import {Action} from "@aragon/osx-commons-contracts/src/executors/IExecutor.sol";
 
 /// @title Admin
-/// @author Aragon X - 2022-2023
+/// @author Aragon X - 2022-2024
 /// @notice The admin governance plugin giving execution permission on the DAO to a single address.
 /// @dev v1.2 (Release 1, Build 2)
 /// @custom:security-contact sirt@aragon.org
@@ -30,6 +30,9 @@ contract Admin is IMembership, PluginCloneable, ProposalUpgradeable {
 
     /// @notice Initializes the contract.
     /// @param _dao The associated DAO.
+    /// @param _targetConfig Configuration for the execution target, specifying the target address and operation type
+    ///     (either `Call` or `DelegateCall`). Defined by `TargetConfig` in the `IPlugin` interface,
+    ///     part of the `osx-commons-contracts` package, added in build 2.
     /// @dev This method is required to support [ERC-1167](https://eips.ethereum.org/EIPS/eip-1167).
     function initialize(IDAO _dao, TargetConfig calldata _targetConfig) external initializer {
         __PluginCloneable_init(_dao);
@@ -94,8 +97,8 @@ contract Admin is IMembership, PluginCloneable, ProposalUpgradeable {
     /// @param _metadata The metadata of the proposal.
     /// @param _actions The actions to be executed.
     /// @param _allowFailureMap A bitmap allowing the proposal to succeed, even if individual actions might revert.
-    /// If the bit at index `i` is 1, the proposal succeeds even if the `i`th action reverts. A failure map value
-    // of 0 requires every action to not revert.
+    ///     If the bit at index `i` is 1, the proposal succeeds even if the `i`th action reverts. A failure map value
+    ///     of 0 requires every action to not revert.
     function executeProposal(
         bytes calldata _metadata,
         Action[] calldata _actions,
