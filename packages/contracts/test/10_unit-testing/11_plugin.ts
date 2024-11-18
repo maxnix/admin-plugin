@@ -153,7 +153,18 @@ describe(PLUGIN_CONTRACT_NAME, function () {
     });
   });
 
-  describe('execute proposal: ', async () => {
+  describe('execute', async () => {
+    it('always reverts', async () => {
+      const {initializedPlugin: plugin} = await loadFixture(fixture);
+
+      await expect(plugin.execute(1)).to.be.revertedWithCustomError(
+        plugin,
+        'FunctionNotSupported'
+      );
+    });
+  });
+
+  describe('executeProposal: ', async () => {
     it('reverts when calling `execute()` if `EXECUTE_PROPOSAL_PERMISSION_ID` is not granted to the admin address', async () => {
       const {
         alice,

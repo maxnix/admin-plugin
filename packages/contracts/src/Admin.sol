@@ -28,6 +28,9 @@ contract Admin is IMembership, PluginCloneable, ProposalUpgradeable {
     bytes32 public constant EXECUTE_PROPOSAL_PERMISSION_ID =
         keccak256("EXECUTE_PROPOSAL_PERMISSION");
 
+    /// @dev Thrown if the `execute` function is called.
+    error FunctionNotSupported();
+
     /// @notice Initializes the contract.
     /// @param _dao The associated DAO.
     /// @param _targetConfig Configuration for the execution target, specifying the target address and operation type
@@ -91,6 +94,19 @@ contract Admin is IMembership, PluginCloneable, ProposalUpgradeable {
     /// @inheritdoc IProposal
     function hasSucceeded(uint256) public view virtual override returns (bool) {
         return true;
+    }
+
+    /// @inheritdoc IProposal
+    function canExecute(uint256) public view virtual override returns (bool) {
+        return true;
+    }
+
+    /// @inheritdoc IProposal
+    /// @dev Note that this function will always revert since this contract doesn't store
+    ///      proposals and only executes the actions at run-time. This function is still
+    ///      necessary to allow compiling the contract as `Admin` inherits from `IProposal`.
+    function execute(uint256) public view virtual override {
+        revert FunctionNotSupported();
     }
 
     /// @notice Creates and executes a new proposal.
