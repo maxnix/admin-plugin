@@ -31,7 +31,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const {deployments} = hre;
   const [deployer] = await hre.ethers.getSigners();
 
-  // / metadata will be empty if running locally
+  // metadata will be empty if running locally
   let releaseMetadataURI = '';
   let buildMetadataURI = '';
 
