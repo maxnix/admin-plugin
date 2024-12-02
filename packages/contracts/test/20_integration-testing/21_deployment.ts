@@ -71,7 +71,6 @@ describe(`Deployment on network '${productionNetworkName}'`, function () {
         build: VERSION.build,
       });
 
-      
       expect(results.pluginSetup).to.equal(pluginSetupAddr);
       expect(results.tag.build).to.equal(VERSION.build);
       expect(results.tag.release).to.equal(VERSION.release);
@@ -122,13 +121,13 @@ async function fixture(): Promise<FixtureResult> {
   );
 
   const pluginSetupAddr = (await deployments.get(PLUGIN_SETUP_CONTRACT_NAME))
-  .address;
+    .address;
 
-return {
-  deployer,
-  pluginRepo,
-  pluginRepoRegistry,
-  managementDaoProxy,
-  pluginSetupAddr,
-};
+  return {
+    deployer,
+    pluginRepo,
+    pluginRepoRegistry,
+    managementDaoProxy,
+    pluginSetupAddr,
+  };
 }

@@ -38,11 +38,13 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   if (!isLocal(hre)) {
     // Upload the metadata to IPFS
     releaseMetadataURI = await uploadToPinata(
-      JSON.stringify(METADATA.release, null, 2), `${PLUGIN_REPO_ENS_SUBDOMAIN_NAME}-release-metadata`
+      JSON.stringify(METADATA.release, null, 2),
+      `${PLUGIN_REPO_ENS_SUBDOMAIN_NAME}-release-metadata`
     );
-   buildMetadataURI = await uploadToPinata(
-    JSON.stringify(METADATA.build, null, 2),       `${PLUGIN_REPO_ENS_SUBDOMAIN_NAME}-build-metadata`
-  );
+    buildMetadataURI = await uploadToPinata(
+      JSON.stringify(METADATA.build, null, 2),
+      `${PLUGIN_REPO_ENS_SUBDOMAIN_NAME}-build-metadata`
+    );
   }
   console.log(`Uploaded release metadata: ${releaseMetadataURI}`);
   console.log(`Uploaded build metadata: ${buildMetadataURI}`);
