@@ -4,3 +4,4 @@ version: 1.x
 prerelease: false
 nav:
   - modules/ROOT/nav.adoc
+  - modules/api/nav.adoc

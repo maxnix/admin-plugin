@@ -10,6 +10,8 @@ dist
 node_modules
 typechain
 
+packages/contracts/node_modules
+
 packages/subgraph/imported
 packages/subgraph/generated
 packages/subgraph/tests/.bin

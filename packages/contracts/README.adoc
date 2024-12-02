@@ -1,0 +1,5 @@
+= Admin Plugin Docs
+
+{{Admin}}
+
+{{AdminSetup}}

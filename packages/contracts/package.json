@@ -10,7 +10,8 @@
     "test": "hardhat test",
     "docgen": "hardhat docgen",
     "typechain": "cross-env TS_NODE_TRANSPILE_ONLY=true hardhat typechain",
-    "clean": "rimraf ./artifacts ./cache ./coverage ./typechain ./types ./coverage.json && yarn typechain"
+    "clean": "rimraf ./artifacts ./cache ./coverage ./typechain ./types ./coverage.json && yarn typechain",
+    "docs": "DOCS=true scripts/prepare-docs.sh"
   },
   "dependencies": {
     "@aragon/osx-commons-contracts": "1.4.0-alpha.5",
@@ -19,8 +20,8 @@
   },
   "devDependencies": {
     "@aragon/osx-commons-configs": "0.4.0",
-    "@aragon/osx-ethers": "1.4.0-alpha.0",
     "@aragon/osx-commons-sdk": "0.0.1-alpha.11",
+    "@aragon/osx-ethers": "1.4.0-alpha.0",
     "@ethersproject/abi": "5.7.0",
     "@ethersproject/abstract-signer": "5.7.0",
     "@ethersproject/bignumber": "5.7.0",
@@ -37,7 +38,6 @@
     "@types/chai": "^4.3.4",
     "@types/mocha": "^10.0.0",
     "@types/node": "^18.11.9",
-    "solidity-docgen": "^0.6.0-beta.36",
     "chai": "^4.3.7",
     "cross-env": "^7.0.3",
     "dotenv": "^16.3.1",
@@ -46,9 +46,11 @@
     "hardhat-deploy": "^0.11.26",
     "hardhat-gas-reporter": "^1.0.9",
     "ipfs-http-client": "^51.0.0",
+    "lodash.startcase": "^4.4.0",
     "mocha": "^10.1.0",
     "rimraf": "^5.0.5",
     "solidity-coverage": "^0.8.2",
+    "solidity-docgen": "^0.6.0-beta.36",
     "tmp-promise": "^3.0.3",
     "ts-node": "^10.9.1",
     "typechain": "^8.3.2",
