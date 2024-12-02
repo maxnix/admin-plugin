@@ -63,7 +63,7 @@ describe(`Deployment on network '${productionNetworkName}'`, function () {
   });
 
   context('PluginSetup Publication', async () => {
-    it.only('registers the setup', async () => {
+    it('registers the setup', async () => {
       const {pluginRepo, pluginSetupAddr} = await loadFixture(fixture);
 
       const results = await pluginRepo['getVersion((uint8,uint16))']({
