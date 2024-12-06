@@ -5,6 +5,7 @@ import {AdminSetup, Admin__factory, AdminSetup__factory} from '../../typechain';
 import {
   ADMIN_INTERFACE,
   EXECUTE_PROPOSAL_PERMISSION_ID,
+  SET_TARGET_CONFIG_PERMISSION_ID,
   TargetConfig,
 } from '../admin-constants';
 import {Operation as Op} from '../admin-constants';
@@ -145,7 +146,7 @@ describe(PLUGIN_SETUP_CONTRACT_NAME, function () {
 
       expect(plugin).to.be.equal(anticipatedPluginAddress);
       expect(helpers.length).to.be.equal(0);
-      expect(permissions.length).to.be.equal(2);
+      expect(permissions.length).to.be.equal(3);
       expect(permissions).to.deep.equal([
         [
           Operation.Grant,
@@ -153,6 +154,13 @@ describe(PLUGIN_SETUP_CONTRACT_NAME, function () {
           alice.address,
           ethers.constants.AddressZero,
           EXECUTE_PROPOSAL_PERMISSION_ID,
+        ],
+        [
+          Operation.Grant,
+          plugin,
+          dao.address,
+          ethers.constants.AddressZero,
+          SET_TARGET_CONFIG_PERMISSION_ID,
         ],
         [
           Operation.Grant,
@@ -208,7 +216,7 @@ describe(PLUGIN_SETUP_CONTRACT_NAME, function () {
         }
       );
 
-      expect(permissions.length).to.be.equal(1);
+      expect(permissions.length).to.be.equal(2);
       expect(permissions).to.deep.equal([
         [
           Operation.Revoke,
@@ -216,6 +224,13 @@ describe(PLUGIN_SETUP_CONTRACT_NAME, function () {
           plugin,
           ethers.constants.AddressZero,
           DAO_PERMISSIONS.EXECUTE_PERMISSION_ID,
+        ],
+        [
+          Operation.Revoke,
+          plugin,
+          dao.address,
+          ethers.constants.AddressZero,
+          SET_TARGET_CONFIG_PERMISSION_ID,
         ],
       ]);
     });
