@@ -1,5 +1,9 @@
 = Admin
 
+WARNING: The contracts are currently being audited, *DO NOT USE IN PRODUCTION*.
+
+== Description
+
 **Admin** is a governance plugin developed and maintained by the Aragon core team. Unlike most governance plugins that store and manage proposals, **Admin** operates as a direct execution tool. While it supports the **IProposal** standard of Aragon OSx, it bypasses proposal storage entirely. Instead, users can create and immediately execute proposals in a single transaction.
 
 This plugin is particularly useful in scenarios where the structure and process of proposals is required, but without the overhead of managing proposal data. The DAO grants `EXECUTE_PERMISSION` to the **Admin** plugin, allowing it to delegate this power via granting `EXECUTE_PROPOSAL_PERMISSION` to specific users or addresses. This means users of the plugin are indirectly granted execution rights within the DAO.
