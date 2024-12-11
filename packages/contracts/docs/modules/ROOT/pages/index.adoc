@@ -19,23 +19,23 @@ This plugin is particularly useful in scenarios where the structure and process 
 |===
 | Permission ID | Where (Granted By) | Who (Granted To) | Condition | Functions
 
-| EXECUTE_PROPOSAL_PERMISSION_ID
+| `EXECUTE_PROPOSAL_PERMISSION_ID`
 | Admin Plugin
 | Admin Address
 | None
-| createProposal, executeProposal
+| `createProposal`, `executeProposal`
 
-| EXECUTE_PERMISSION_ID
+| `EXECUTE_PERMISSION_ID`
 | DAO
 | Admin Plugin
 | None
-| execute
+| `execute`
 
-| SET_TARGET_CONFIG_PERMISSION_ID
+| `SET_TARGET_CONFIG_PERMISSION_ID`
 | Plugin
 | DAO
 | None
-| setTargetConfig
+| `setTargetConfig`
 |===
 
 This setup ensures that the **Admin** plugin is ready for operation immediately after installation, with all required contracts deployed and permissions configured.
