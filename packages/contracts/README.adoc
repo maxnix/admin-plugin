@@ -1,4 +1,6 @@
-= Admin Plugin Docs
+= Admin API
+
+== Core
 
 {{Admin}}
 

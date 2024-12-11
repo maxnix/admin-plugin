@@ -17,7 +17,9 @@
 :xref-AdminSetup-EXECUTE_PROPOSAL_PERMISSION_ID-bytes32: xref:Admin.adoc#AdminSetup-EXECUTE_PROPOSAL_PERMISSION_ID-bytes32
 :xref-AdminSetup-AdminAddressInvalid-address-: xref:Admin.adoc#AdminSetup-AdminAddressInvalid-address-
 :xref-AdminSetup-EXECUTE_PERMISSION_ID-bytes32: xref:Admin.adoc#AdminSetup-EXECUTE_PERMISSION_ID-bytes32
-= Admin Plugin Docs
+= Admin API
+
+== Core
 
 :ADMIN_INTERFACE_ID: pass:normal[xref:#Admin-ADMIN_INTERFACE_ID-bytes4[`++ADMIN_INTERFACE_ID++`]]
 :EXECUTE_PROPOSAL_PERMISSION_ID: pass:normal[xref:#Admin-EXECUTE_PROPOSAL_PERMISSION_ID-bytes32[`++EXECUTE_PROPOSAL_PERMISSION_ID++`]]
