@@ -9,10 +9,14 @@
 :xref-Admin-execute-uint256-: xref:Admin.adoc#Admin-execute-uint256-
 :xref-Admin-executeProposal-bytes-struct-Action---uint256-: xref:Admin.adoc#Admin-executeProposal-bytes-struct-Action---uint256-
 :xref-Admin-EXECUTE_PROPOSAL_PERMISSION_ID-bytes32: xref:Admin.adoc#Admin-EXECUTE_PROPOSAL_PERMISSION_ID-bytes32
+:xref-Admin-FunctionNotSupported--: xref:Admin.adoc#Admin-FunctionNotSupported--
+:xref-Admin-ADMIN_INTERFACE_ID-bytes4: xref:Admin.adoc#Admin-ADMIN_INTERFACE_ID-bytes4
 :xref-AdminSetup-constructor--: xref:Admin.adoc#AdminSetup-constructor--
 :xref-AdminSetup-prepareInstallation-address-bytes-: xref:Admin.adoc#AdminSetup-prepareInstallation-address-bytes-
 :xref-AdminSetup-prepareUninstallation-address-struct-IPluginSetup-SetupPayload-: xref:Admin.adoc#AdminSetup-prepareUninstallation-address-struct-IPluginSetup-SetupPayload-
 :xref-AdminSetup-EXECUTE_PROPOSAL_PERMISSION_ID-bytes32: xref:Admin.adoc#AdminSetup-EXECUTE_PROPOSAL_PERMISSION_ID-bytes32
+:xref-AdminSetup-AdminAddressInvalid-address-: xref:Admin.adoc#AdminSetup-AdminAddressInvalid-address-
+:xref-AdminSetup-EXECUTE_PERMISSION_ID-bytes32: xref:Admin.adoc#AdminSetup-EXECUTE_PERMISSION_ID-bytes32
 = Admin Plugin Docs
 
 :ADMIN_INTERFACE_ID: pass:normal[xref:#Admin-ADMIN_INTERFACE_ID-bytes4[`++ADMIN_INTERFACE_ID++`]]
@@ -30,7 +34,7 @@
 
 [.contract]
 [[Admin]]
-=== `++Admin++` link:/blob/v1.0/src/Admin.sol[{github-icon},role=heading-link]
+=== `++Admin++` link:https://github.com/aragon/blob/v1.0/src/Admin.sol[{github-icon},role=heading-link]
 
 v1.2 (Release 1, Build 2)
 
@@ -151,6 +155,7 @@ v1.2 (Release 1, Build 2)
 [.contract-index]
 .Errors
 --
+* {xref-Admin-FunctionNotSupported--}[`++FunctionNotSupported()++`]
 
 [.contract-subindex-inherited]
 .ProposalUpgradeable
@@ -196,15 +201,13 @@ v1.2 (Release 1, Build 2)
 [.contract-index]
 .Internal Variables
 --
+* {xref-Admin-ADMIN_INTERFACE_ID-bytes4}[`++bytes4 constant ADMIN_INTERFACE_ID++`]
 
 [.contract-subindex-inherited]
 .ProposalUpgradeable
-* link:https://github.com/aragon/osx-commons/tree/main/contracts/src/plugin/extensions/proposal/ProposalUpgradeable.sol[FunctionDeprecated]
 
 [.contract-subindex-inherited]
 .PluginCloneable
-* link:https://github.com/aragon/osx-commons/tree/main/contracts/src/plugin/PluginCloneable.sol[InvalidTargetConfig]
-* link:https://github.com/aragon/osx-commons/tree/main/contracts/src/plugin/PluginCloneable.sol[DelegateCallFailed]
 
 [.contract-subindex-inherited]
 .ProtocolVersion
@@ -264,7 +267,7 @@ This function must be implemented in the plugin contract that introduces the mem
 [[Admin-customProposalParamsABI--]]
 ==== `[.contract-item-name]#++customProposalParamsABI++#++() → string++` [.item-kind]#external#
 
-The human-readable abi format for extra params included in &#x60;data&#x60; of &#x60;createProposal&#x60;.
+The human-readable abi format for extra params included in `data` of `createProposal`.
 
 Used for UI to easily detect what extra params the contract expects.
 
@@ -294,9 +297,9 @@ Checks if a proposal can be executed.
 
 Executes a proposal.
 
-Note that this function will always revert since this contract doesn&#x27;t store
+Note that this function will always revert since this contract doesn't store
      proposals and only executes the actions at run-time. This function is still
-     necessary to allow compiling the contract as &#x60;Admin&#x60; inherits from &#x60;IProposal&#x60;.
+     necessary to allow compiling the contract as `Admin` inherits from `IProposal`.
 
 [.contract-item]
 [[Admin-executeProposal-bytes-struct-Action---uint256-]]
@@ -308,13 +311,13 @@ Creates and executes a new proposal.
 [[Admin-EXECUTE_PROPOSAL_PERMISSION_ID-bytes32]]
 ==== `[.contract-item-name]#++EXECUTE_PROPOSAL_PERMISSION_ID++#++() → bytes32++` [.item-kind]#public#
 
-The ID of the permission required to call the &#x60;executeProposal&#x60; function.
+The ID of the permission required to call the `executeProposal` function.
 
 [.contract-item]
 [[Admin-FunctionNotSupported--]]
 ==== `[.contract-item-name]#++FunctionNotSupported++#++()++` [.item-kind]#error#
 
-Thrown if the &#x60;execute&#x60; function is called.
+Thrown if the `execute` function is called.
 
 [.contract-item]
 [[Admin-ADMIN_INTERFACE_ID-bytes4]]
@@ -331,7 +334,7 @@ The [ERC-165](https://eips.ethereum.org/EIPS/eip-165) interface ID of the contra
 
 [.contract]
 [[AdminSetup]]
-=== `++AdminSetup++` link:/blob/v1.0/src/AdminSetup.sol[{github-icon},role=heading-link]
+=== `++AdminSetup++` link:https://github.com/aragon/blob/v1.0/src/AdminSetup.sol[{github-icon},role=heading-link]
 
 v1.2 (Release 1, Build 2)
 
@@ -370,6 +373,7 @@ v1.2 (Release 1, Build 2)
 [.contract-index]
 .Errors
 --
+* {xref-AdminSetup-AdminAddressInvalid-address-}[`++AdminAddressInvalid(admin)++`]
 
 [.contract-subindex-inherited]
 .PluginSetup
@@ -395,10 +399,11 @@ v1.2 (Release 1, Build 2)
 [.contract-index]
 .Internal Variables
 --
+* {xref-AdminSetup-EXECUTE_PERMISSION_ID-bytes32}[`++bytes32 constant EXECUTE_PERMISSION_ID++`]
 
 [.contract-subindex-inherited]
 .PluginSetup
-* link:https://github.com/aragon/osx-commons/tree/main/contracts/src/plugin/setup/PluginSetup.sol[NonUpgradeablePlugin]
+* link:https://github.com/aragon/osx-commons/tree/main/contracts/src/plugin/setup/PluginSetup.sol[IMPLEMENTATION]
 
 [.contract-subindex-inherited]
 .ProtocolVersion
@@ -421,7 +426,7 @@ v1.2 (Release 1, Build 2)
 [[AdminSetup-constructor--]]
 ==== `[.contract-item-name]#++constructor++#++()++` [.item-kind]#public#
 
-The constructor setting the &#x60;Admin&#x60; implementation contract to clone from.
+The constructor setting the `Admin` implementation contract to clone from.
 
 [.contract-item]
 [[AdminSetup-prepareInstallation-address-bytes-]]
@@ -435,14 +440,14 @@ Prepares the installation of a plugin.
 
 Prepares the uninstallation of a plugin.
 
-Currently, there is no reliable way to revoke the &#x60;ADMIN_EXECUTE_PERMISSION_ID&#x60; from all addresses
-    it has been granted to. Accordingly, only the &#x60;EXECUTE_PERMISSION_ID&#x60; is revoked for this uninstallation.
+Currently, there is no reliable way to revoke the `ADMIN_EXECUTE_PERMISSION_ID` from all addresses
+    it has been granted to. Accordingly, only the `EXECUTE_PERMISSION_ID` is revoked for this uninstallation.
 
 [.contract-item]
 [[AdminSetup-EXECUTE_PROPOSAL_PERMISSION_ID-bytes32]]
 ==== `[.contract-item-name]#++EXECUTE_PROPOSAL_PERMISSION_ID++#++() → bytes32++` [.item-kind]#public#
 
-The ID of the permission required to call the &#x60;executeProposal&#x60; function.
+The ID of the permission required to call the `executeProposal` function.
 
 [.contract-item]
 [[AdminSetup-AdminAddressInvalid-address-]]
@@ -454,5 +459,5 @@ Thrown if the admin address is zero.
 [[AdminSetup-EXECUTE_PERMISSION_ID-bytes32]]
 ==== `bytes32 [.contract-item-name]#++EXECUTE_PERMISSION_ID++#` [.item-kind]#internal constant#
 
-The ID of the permission required to call the &#x60;execute&#x60; function.
+The ID of the permission required to call the `execute` function.
 
