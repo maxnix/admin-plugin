@@ -19,7 +19,7 @@
 :xref-AdminSetup-EXECUTE_PERMISSION_ID-bytes32: xref:Admin.adoc#AdminSetup-EXECUTE_PERMISSION_ID-bytes32
 = Admin API
 
-IMPORTANT: The contracts are currently being audited, DO NOT USE IN PRODUCTION.
+IMPORTANT: The contracts of build 2(use build 1) are currently being audited, DO NOT USE IN PRODUCTION.
 
 == Core
 
