@@ -10,7 +10,7 @@ import {
 } from '../admin-constants';
 import {Operation as Op} from '../admin-constants';
 import {loadFixtureCustom} from '../test-utils/fixture';
-import {skipTestIfNetworkIsZkSync} from '../test-utils/scip-functions';
+import {skipTestIfNetworkIsZkSync} from '../test-utils/skip-functions';
 import {ARTIFACT_SOURCES} from '../test-utils/wrapper';
 import {
   Operation,

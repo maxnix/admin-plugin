@@ -2,7 +2,7 @@ import {METADATA, VERSION} from '../../plugin-settings';
 import {AdminSetup, AdminSetup__factory, Admin__factory} from '../../typechain';
 import {getProductionNetworkName, findPluginRepo} from '../../utils/helpers';
 import {Operation, TargetConfig} from '../admin-constants';
-import {skipTestSuiteIfNetworkIsZkSync} from '../test-utils/scip-functions';
+import {skipTestSuiteIfNetworkIsZkSync} from '../test-utils/skip-functions';
 import {createDaoProxy, installPLugin, uninstallPLugin} from './test-helpers';
 import {
   getLatestNetworkDeployment,

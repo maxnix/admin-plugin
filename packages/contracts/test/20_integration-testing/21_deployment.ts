@@ -1,7 +1,7 @@
 import {METADATA, VERSION} from '../../plugin-settings';
 import {getProductionNetworkName, findPluginRepo} from '../../utils/helpers';
 import {loadFixtureCustom} from '../test-utils/fixture';
-import {skipTestSuiteIfNetworkIsZkSync} from '../test-utils/scip-functions';
+import {skipTestSuiteIfNetworkIsZkSync} from '../test-utils/skip-functions';
 import {
   getLatestNetworkDeployment,
   getNetworkNameByAlias,

@@ -28,7 +28,7 @@ import {
   skipTestIfNetworkIsZkSync,
   skipTestSuiteIfNetworkIsNotZkSync,
   skipTestSuiteIfNetworkIsZkSync,
-} from '../test-utils/scip-functions';
+} from '../test-utils/skip-functions';
 import {ARTIFACT_SOURCES} from '../test-utils/wrapper';
 import {
   findEvent,
