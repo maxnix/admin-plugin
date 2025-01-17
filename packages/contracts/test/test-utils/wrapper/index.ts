@@ -11,19 +11,9 @@ export const ARTIFACT_SOURCES = {
   DAO: '@aragon/osx/core/dao/DAO.sol:DAO',
   DAO_V1_0_0: '@aragon/osx-v1.0.1/core/dao/DAO.sol:DAO',
   DAO_V1_3_0: '@aragon/osx-v1.3.0/core/dao/DAO.sol:DAO',
-  MajorityVotingMock: 'src/mocks/MajorityVotingMock.sol:MajorityVotingMock',
-  VotingPowerCondition: 'src/VotingPowerCondition.sol:VotingPowerCondition',
-  TokenVoting: 'src/TokenVoting.sol:TokenVoting',
-  TestGovernanceERC20: 'src/mocks/TestGovernanceERC20.sol:TestGovernanceERC20',
-  GovernanceERC20: 'src/ERC20/governance/GovernanceERC20.sol:GovernanceERC20',
-  ERC20Mock: 'src/mocks/ERC20Mock.sol:ERC20Mock',
-  GovernanceWrappedERC20:
-    'src/ERC20/governance/GovernanceWrappedERC20.sol:GovernanceWrappedERC20',
+  Admin: 'src/Admin.sol:Admin',
+  AdminZkSync: 'src/zkSync/AdminZkSync.sol:AdminZkSync',
   CustomExecutorMock: 'src/mocks/CustomExecutorMock.sol:CustomExecutorMock',
-  ERC20: '@openzeppelin/contracts/token/ERC20/ERC20.sol:ERC20',
-  TokenVotingSetup: 'src/TokenVotingSetup.sol:TokenVotingSetup',
-  TokenVotingSetupZkSync:
-    'src/zksync/TokenVotingSetupZkSync.sol:TokenVotingSetupZkSync',
 };
 
 export type DeployOptions = {
