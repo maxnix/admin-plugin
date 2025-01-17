@@ -67,7 +67,7 @@ async function createProposalId(
   );
 }
 
-describe.only(PLUGIN_CONTRACT_NAME, function () {
+describe(PLUGIN_CONTRACT_NAME, function () {
   before(async () => {
     chainId = (await ethers.provider.getNetwork()).chainId;
   });

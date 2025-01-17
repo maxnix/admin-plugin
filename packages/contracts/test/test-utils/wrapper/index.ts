@@ -14,6 +14,8 @@ export const ARTIFACT_SOURCES = {
   Admin: 'src/Admin.sol:Admin',
   AdminZkSync: 'src/zkSync/AdminZkSync.sol:AdminZkSync',
   CustomExecutorMock: 'src/mocks/CustomExecutorMock.sol:CustomExecutorMock',
+  AdminSetup: 'src/AdminSetup.sol:AdminSetup',
+  AdminSetupZkSync: 'src/zkSync/AdminSetupZkSync.sol:AdminSetupZkSync',
 };
 
 export type DeployOptions = {

@@ -2,12 +2,16 @@ import {createDaoProxy} from '../20_integration-testing/test-helpers';
 import {PLUGIN_SETUP_CONTRACT_NAME} from '../../plugin-settings';
 import buildMetadata from '../../src/build-metadata.json';
 import {AdminSetup, Admin__factory, AdminSetup__factory} from '../../typechain';
+import {isZkSync} from '../../utils/zkSync';
 import {
   ADMIN_INTERFACE,
   EXECUTE_PROPOSAL_PERMISSION_ID,
   TargetConfig,
 } from '../admin-constants';
 import {Operation as Op} from '../admin-constants';
+import {loadFixtureCustom} from '../test-utils/fixture';
+import {skipTestIfNetworkIsZkSync} from '../test-utils/scip-functions';
+import {ARTIFACT_SOURCES} from '../test-utils/wrapper';
 import {
   Operation,
   DAO_PERMISSIONS,
@@ -15,10 +19,9 @@ import {
   getNamedTypesFromMetadata,
 } from '@aragon/osx-commons-sdk';
 import {DAO} from '@aragon/osx-ethers';
-import {loadFixture} from '@nomicfoundation/hardhat-network-helpers';
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers';
 import {expect} from 'chai';
-import {ethers} from 'hardhat';
+import hre, {ethers} from 'hardhat';
 
 type FixtureResult = {
   deployer: SignerWithAddress;
@@ -35,7 +38,12 @@ async function fixture(): Promise<FixtureResult> {
   const [deployer, alice, bob] = await ethers.getSigners();
   const dummyMetadata = '0x12345678';
   const dao = await createDaoProxy(deployer, dummyMetadata);
-  const pluginSetup = await new AdminSetup__factory(deployer).deploy();
+
+  const artifactSource = isZkSync
+    ? ARTIFACT_SOURCES.AdminSetupZkSync
+    : ARTIFACT_SOURCES.AdminSetup;
+
+  const pluginSetup = await hre.wrapper.deploy(artifactSource);
 
   const targetConfig: TargetConfig = {
     operation: Op.call,
@@ -69,27 +77,31 @@ async function fixture(): Promise<FixtureResult> {
 
 describe(PLUGIN_SETUP_CONTRACT_NAME, function () {
   it('does not support the empty interface', async () => {
-    const {pluginSetup} = await loadFixture(fixture);
+    const {pluginSetup} = await loadFixtureCustom(fixture);
     expect(await pluginSetup.supportsInterface('0xffffffff')).to.be.false;
   });
 
-  it('has an admin plugin implementation base with the correct interface', async () => {
-    const {deployer, pluginSetup} = await loadFixture(fixture);
+  skipTestIfNetworkIsZkSync(
+    'zkSync plugin setup use address 0 as implementation',
+    () => {
+      it('has an admin plugin implementation base with the correct interface', async () => {
+        const {deployer, pluginSetup} = await loadFixtureCustom(fixture);
 
-    const admin = Admin__factory.connect(
-      await pluginSetup.implementation(),
-      deployer
-    );
-    expect(
-      await admin.supportsInterface(getInterfaceId(ADMIN_INTERFACE))
-    ).to.be.eq(true);
-  });
+        const admin = Admin__factory.connect(
+          await pluginSetup.implementation(),
+          deployer
+        );
+        expect(
+          await admin.supportsInterface(getInterfaceId(ADMIN_INTERFACE))
+        ).to.be.eq(true);
+      });
+    }
+  );
 
   describe('prepareInstallation', async () => {
     it('fails if data is empty, or not of minimum length', async () => {
-      const {pluginSetup, prepareInstallationInputs, dao} = await loadFixture(
-        fixture
-      );
+      const {pluginSetup, prepareInstallationInputs, dao} =
+        await loadFixtureCustom(fixture);
 
       await expect(pluginSetup.prepareInstallation(dao.address, [])).to.be
         .reverted;
@@ -107,7 +119,7 @@ describe(PLUGIN_SETUP_CONTRACT_NAME, function () {
     });
 
     it('reverts if encoded address in `_data` is zero', async () => {
-      const {pluginSetup, dao, targetConfig} = await loadFixture(fixture);
+      const {pluginSetup, dao, targetConfig} = await loadFixtureCustom(fixture);
 
       const dataWithAddressZero = ethers.utils.defaultAbiCoder.encode(
         getNamedTypesFromMetadata(
@@ -125,15 +137,13 @@ describe(PLUGIN_SETUP_CONTRACT_NAME, function () {
 
     it('returns the plugin, helpers and permissions', async () => {
       const {alice, pluginSetup, prepareInstallationInputs, dao} =
-        await loadFixture(fixture);
+        await loadFixtureCustom(fixture);
 
-      const nonce = await ethers.provider.getTransactionCount(
-        pluginSetup.address
+      const nonce = await hre.wrapper.getNonce(pluginSetup.address);
+      const anticipatedPluginAddress = hre.wrapper.getCreateAddress(
+        pluginSetup.address,
+        nonce
       );
-      const anticipatedPluginAddress = ethers.utils.getContractAddress({
-        from: pluginSetup.address,
-        nonce,
-      });
 
       const {
         plugin,
@@ -166,16 +176,14 @@ describe(PLUGIN_SETUP_CONTRACT_NAME, function () {
 
     it('sets the dao for prepared plugins', async () => {
       const {deployer, pluginSetup, prepareInstallationInputs, dao} =
-        await loadFixture(fixture);
+        await loadFixtureCustom(fixture);
 
       // Check the nonce of the setup contract to obtain the address of the next deployed contract, which will be the plugin clone
-      const nonce = await ethers.provider.getTransactionCount(
-        pluginSetup.address
+      const nonce = await hre.wrapper.getNonce(pluginSetup.address);
+      const anticipatedPluginAddress = hre.wrapper.getCreateAddress(
+        pluginSetup.address,
+        nonce
       );
-      const anticipatedPluginAddress = ethers.utils.getContractAddress({
-        from: pluginSetup.address,
-        nonce,
-      });
 
       await pluginSetup.prepareInstallation(
         dao.address,
@@ -193,9 +201,8 @@ describe(PLUGIN_SETUP_CONTRACT_NAME, function () {
 
   describe('prepareUninstallation', async () => {
     it('returns the permissions', async () => {
-      const {pluginSetup, prepareUninstallationInputs, dao} = await loadFixture(
-        fixture
-      );
+      const {pluginSetup, prepareUninstallationInputs, dao} =
+        await loadFixtureCustom(fixture);
 
       const plugin = ethers.Wallet.createRandom().address;
 
