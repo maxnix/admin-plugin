@@ -32,3 +32,4 @@ packages/subgraph/tests/helpers/extended-schema.ts
 artifacts-zk
 cache-zk
 deployments-zk
+deployments
