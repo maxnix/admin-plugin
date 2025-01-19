@@ -100,8 +100,8 @@ describe(PLUGIN_CONTRACT_NAME, function () {
     });
   });
 
-  skipTestSuiteIfNetworkIsNotZkSync('construct', () => {
-    describe('construct', async () => {
+  skipTestSuiteIfNetworkIsNotZkSync('constructor', () => {
+    describe('constructor', async () => {
       it('emits the `MembershipContractAnnounced` event', async () => {
         const {dao, initializedPlugin} = await loadFixtureCustom(fixture);
 
@@ -518,18 +518,20 @@ async function fixture(): Promise<FixtureResult> {
   let initializedPlugin: any;
   let uninitializedPlugin: any;
 
-  const artifactSource = isZkSync
+  const isZksync = isZkSync(hre.network.name);
+
+  const artifactSource = isZksync
     ? ARTIFACT_SOURCES.AdminZkSync
     : ARTIFACT_SOURCES.Admin;
 
-  const deployArgs = isZkSync
+  const deployArgs = isZksync
     ? {withProxy: false, args: [dao.address, targetConfig]}
     : {withProxy: true};
 
   initializedPlugin = await hre.wrapper.deploy(artifactSource, deployArgs);
   uninitializedPlugin = await hre.wrapper.deploy(artifactSource, deployArgs);
 
-  if (!isZkSync) {
+  if (!isZksync) {
     initializedPlugin.initialize(dao.address, targetConfig);
   }
 

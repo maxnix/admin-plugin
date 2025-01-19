@@ -39,7 +39,7 @@ async function fixture(): Promise<FixtureResult> {
   const dummyMetadata = '0x12345678';
   const dao = await createDaoProxy(deployer, dummyMetadata);
 
-  const artifactSource = isZkSync
+  const artifactSource = isZkSync(hre.network.name)
     ? ARTIFACT_SOURCES.AdminSetupZkSync
     : ARTIFACT_SOURCES.AdminSetup;
 
