@@ -31,7 +31,8 @@ contract AdminSetupZkSync is PluginSetup {
     error AdminAddressInvalid(address admin);
 
     /// @notice The constructor setting the `Admin` implementation contract to clone from.
-    constructor() PluginSetup(address(0)) {} // Since this is only ment to be used for zkSync we pass address(0) as implementation
+    /// @dev Since this is only ment to be used for zkSync we pass address(0) as implementation
+    constructor() PluginSetup(address(0)) {}
 
     /// @inheritdoc IPluginSetup
     function prepareInstallation(

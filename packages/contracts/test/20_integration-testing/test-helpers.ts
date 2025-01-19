@@ -1,5 +1,4 @@
-import {IPlugin, ProxyFactory__factory} from '../../typechain';
-import {ProxyCreatedEvent} from '../../typechain/@aragon/osx-commons-contracts/src/utils/deployment/ProxyFactory';
+import {IPlugin} from '../../typechain';
 import {ARTIFACT_SOURCES} from '../test-utils/wrapper';
 import {
   DAO_PERMISSIONS,
@@ -12,7 +11,6 @@ import {
   PluginSetupProcessor,
   DAOStructs,
   DAO,
-  DAO__factory,
 } from '@aragon/osx-ethers';
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers';
 import {expect} from 'chai';
