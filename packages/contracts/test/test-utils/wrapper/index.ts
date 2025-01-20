@@ -2,7 +2,7 @@ import {ProxyCreatedEvent} from '../../../typechain/ProxyFactory';
 import {HardhatClass} from './hardhat';
 import {ZkSync} from './zksync';
 import {findEvent} from '@aragon/osx-commons-sdk';
-import {BigNumberish, Contract, Wallet} from 'ethers';
+import {BigNumberish, Contract} from 'ethers';
 import {providers} from 'ethers';
 import hre, {ethers} from 'hardhat';
 
@@ -77,7 +77,7 @@ export class Wrapper {
         });
       }
 
-      // @ts-ignore TODO:GIORGI
+      // @ts-expect-error TODO:GIORGI
       return new Wrapper(new ZkSync(provider));
     }
 
@@ -89,10 +89,11 @@ export class Wrapper {
     const isProxy = options?.withProxy ?? false;
     const initializer = options?.proxySettings?.initializer ?? undefined;
 
-    let {artifact, contract} = await this.network.deploy(
-      artifactName,
-      constructorArgs
-    );
+    const deployRes = await this.network.deploy(artifactName, constructorArgs);
+
+    const artifact = deployRes.artifact;
+    const contract = deployRes.contract;
+
     if (isProxy) {
       const {contract: proxyFactoryContract} = await this.network.deploy(
         'ProxyFactory',

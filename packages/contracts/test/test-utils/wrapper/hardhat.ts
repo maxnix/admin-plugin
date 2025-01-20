@@ -48,6 +48,7 @@ export class HardhatClass implements NetworkDeployment {
     sender: string,
     type?: 'Deployment' | 'Transaction'
   ): Promise<number> {
+    type;
     return this.provider.getTransactionCount(sender);
   }
 

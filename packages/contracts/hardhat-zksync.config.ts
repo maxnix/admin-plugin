@@ -1,3 +1,4 @@
+import './types/hardhat';
 import {isZkSync} from './utils/zkSync';
 import RichAccounts from './utils/zksync-rich-accounts';
 import {addRpcUrlToNetwork} from '@aragon/osx-commons-configs';
@@ -84,17 +85,6 @@ extendEnvironment((hre: HardhatRuntimeEnvironment) => {
 
 const namedAccounts = {
   deployer: 0,
-  alice: 1,
-  bob: 2,
-  carol: 3,
-  dave: 4,
-  eve: 5,
-  frank: 6,
-  grace: 7,
-  harold: 8,
-  ivan: 9,
-  judy: 10,
-  mallory: 11,
 };
 
 const config: HardhatUserConfig = {

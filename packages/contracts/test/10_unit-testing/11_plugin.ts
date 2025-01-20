@@ -12,7 +12,6 @@ import {
   IProtocolVersion__factory,
   ProxyFactory__factory,
 } from '../../typechain';
-import {ProxyCreatedEvent} from '../../typechain/@aragon/osx-commons-contracts/src/utils/deployment/ProxyFactory';
 import {ProposalCreatedEvent} from '../../typechain/src/Admin';
 import {isZkSync, ZK_SYNC_NETWORKS} from '../../utils/zkSync';
 import {
@@ -24,8 +23,6 @@ import {
 } from '../admin-constants';
 import {loadFixtureCustom} from '../test-utils/fixture';
 import {
-  skipDescribeIfNot,
-  skipTestIfNetworkIsZkSync,
   skipTestSuiteIfNetworkIsNotZkSync,
   skipTestSuiteIfNetworkIsZkSync,
 } from '../test-utils/skip-functions';
@@ -515,9 +512,6 @@ async function fixture(): Promise<FixtureResult> {
     target: dao.address,
   };
 
-  let initializedPlugin: any;
-  let uninitializedPlugin: any;
-
   const isZksync = isZkSync(hre.network.name);
 
   const artifactSource = isZksync
@@ -528,8 +522,14 @@ async function fixture(): Promise<FixtureResult> {
     ? {withProxy: false, args: [dao.address, targetConfig]}
     : {withProxy: true};
 
-  initializedPlugin = await hre.wrapper.deploy(artifactSource, deployArgs);
-  uninitializedPlugin = await hre.wrapper.deploy(artifactSource, deployArgs);
+  const initializedPlugin = await hre.wrapper.deploy(
+    artifactSource,
+    deployArgs
+  );
+  const uninitializedPlugin = await hre.wrapper.deploy(
+    artifactSource,
+    deployArgs
+  );
 
   if (!isZksync) {
     initializedPlugin.initialize(dao.address, targetConfig);
