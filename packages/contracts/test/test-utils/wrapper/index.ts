@@ -92,7 +92,7 @@ export class Wrapper {
     const deployRes = await this.network.deploy(artifactName, constructorArgs);
 
     const artifact = deployRes.artifact;
-    const contract = deployRes.contract;
+    let contract = deployRes.contract;
 
     if (isProxy) {
       const {contract: proxyFactoryContract} = await this.network.deploy(

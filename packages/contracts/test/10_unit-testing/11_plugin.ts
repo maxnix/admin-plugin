@@ -532,7 +532,7 @@ async function fixture(): Promise<FixtureResult> {
   );
 
   if (!isZksync) {
-    initializedPlugin.initialize(dao.address, targetConfig);
+    await initializedPlugin.initialize(dao.address, targetConfig);
   }
 
   const dummyActions: DAOStructs.ActionStruct[] = [

@@ -1,6 +1,5 @@
-import {METADATA, VERSION} from '../../plugin-settings';
+import {VERSION, PLUGIN_SETUP_CONTRACT_NAME} from '../../plugin-settings';
 import {getProductionNetworkName, findPluginRepo} from '../../utils/helpers';
-import {loadFixtureCustom} from '../test-utils/fixture';
 import {skipTestSuiteIfNetworkIsZkSync} from '../test-utils/skip-functions';
 import {
   getLatestNetworkDeployment,
@@ -11,7 +10,6 @@ import {
   PERMISSION_MANAGER_FLAGS,
   PLUGIN_REPO_PERMISSIONS,
   UnsupportedNetworkError,
-  uploadToIPFS,
 } from '@aragon/osx-commons-sdk';
 import {
   DAO,
@@ -20,6 +18,7 @@ import {
   PluginRepoRegistry,
   PluginRepoRegistry__factory,
 } from '@aragon/osx-ethers';
+import {loadFixture} from '@nomicfoundation/hardhat-network-helpers';
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers';
 import {expect} from 'chai';
 import env, {deployments, ethers} from 'hardhat';
@@ -30,13 +29,13 @@ skipTestSuiteIfNetworkIsZkSync(
   `Deployment on network '${productionNetworkName}'`,
   function () {
     it('creates the repo', async () => {
-      const {pluginRepo, pluginRepoRegistry} = await loadFixtureCustom(fixture);
+      const {pluginRepo, pluginRepoRegistry} = await loadFixture(fixture);
 
       expect(await pluginRepoRegistry.entries(pluginRepo.address)).to.be.true;
     });
 
     it('gives the management DAO permissions over the repo', async () => {
-      const {pluginRepo, managementDaoProxy} = await loadFixtureCustom(fixture);
+      const {pluginRepo, managementDaoProxy} = await loadFixture(fixture);
 
       expect(
         await pluginRepo.isGranted(
@@ -68,20 +67,16 @@ skipTestSuiteIfNetworkIsZkSync(
 
     context('PluginSetup Publication', async () => {
       it('registers the setup', async () => {
-        const {pluginRepo} = await loadFixtureCustom(fixture);
+        const {pluginRepo, pluginSetupAddr} = await loadFixture(fixture);
 
         const results = await pluginRepo['getVersion((uint8,uint16))']({
           release: VERSION.release,
           build: VERSION.build,
         });
 
-        const buildMetadataURI = `ipfs://${await uploadToIPFS(
-          JSON.stringify(METADATA.build, null, 2)
-        )}`;
-
-        expect(results.buildMetadata).to.equal(
-          ethers.utils.hexlify(ethers.utils.toUtf8Bytes(buildMetadataURI))
-        );
+        expect(results.pluginSetup).to.equal(pluginSetupAddr);
+        expect(results.tag.build).to.equal(VERSION.build);
+        expect(results.tag.release).to.equal(VERSION.release);
       });
     });
   }
@@ -92,6 +87,7 @@ type FixtureResult = {
   pluginRepo: PluginRepo;
   pluginRepoRegistry: PluginRepoRegistry;
   managementDaoProxy: DAO;
+  pluginSetupAddr: string;
 };
 
 async function fixture(): Promise<FixtureResult> {
@@ -128,5 +124,14 @@ async function fixture(): Promise<FixtureResult> {
     deployer
   );
 
-  return {deployer, pluginRepo, pluginRepoRegistry, managementDaoProxy};
+  const pluginSetupAddr = (await deployments.get(PLUGIN_SETUP_CONTRACT_NAME))
+    .address;
+
+  return {
+    deployer,
+    pluginRepo,
+    pluginRepoRegistry,
+    managementDaoProxy,
+    pluginSetupAddr,
+  };
 }
