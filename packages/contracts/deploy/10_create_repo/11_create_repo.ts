@@ -18,8 +18,6 @@ import {
   PluginRepo__factory,
   PluginRepoFactory__factory,
 } from '@aragon/osx-ethers';
-import {defaultAbiCoder} from '@ethersproject/abi';
-import {ethers} from 'hardhat';
 import {DeployFunction} from 'hardhat-deploy/types';
 import {HardhatRuntimeEnvironment} from 'hardhat/types';
 import path from 'path';
@@ -75,16 +73,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     `PluginRepo '${pluginEnsDomain(hre)}' deployed at '${pluginRepo.address}'.`
   );
 
-  const ERC1967_IMPLEMENTATION_SLOT =
-    '0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc';
-  const implementationAddress = await ethers.provider
-    .getStorageAt(pluginRepo.address, ERC1967_IMPLEMENTATION_SLOT)
-    .then(encoded => defaultAbiCoder.decode(['address'], encoded)[0]);
-
-  console.log('implementationAddress', implementationAddress);
-
   hre.aragonToVerifyContracts.push({
-    address: implementationAddress,
+    address: pluginRepo.address,
     args: [],
   });
 };
