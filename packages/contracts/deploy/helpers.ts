@@ -9,7 +9,7 @@ export function getLatestContractAddress(
   contractName: string,
   hre: HardhatRuntimeEnvironment
 ): string {
-  let networkName = hre.network.name;
+  const networkName = hre.network.name;
 
   const osxNetworkName = getNetworkByNameOrAlias(networkName);
   if (!osxNetworkName) {
