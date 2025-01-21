@@ -5,6 +5,7 @@ import {
   PLUGIN_SETUP_CONTRACT_NAME,
   VERSION,
 } from '../../plugin-settings';
+import {PluginRepo} from '../../typechain';
 import {
   findPluginRepo,
   getPastVersionCreatedEvents,
@@ -12,12 +13,33 @@ import {
   isLocal,
   pluginEnsDomain,
 } from '../../utils/helpers';
+import {getLatestContractAddress} from '../helpers';
 import {PLUGIN_REPO_PERMISSIONS, uploadToPinata} from '@aragon/osx-commons-sdk';
+import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers';
 import {writeFile} from 'fs/promises';
 import {ethers} from 'hardhat';
 import {DeployFunction} from 'hardhat-deploy/types';
 import {HardhatRuntimeEnvironment} from 'hardhat/types';
 import path from 'path';
+
+async function createVersion(
+  pluginRepo: PluginRepo,
+  release: number,
+  setup: string,
+  releaseMetadataURI: string,
+  buildMetadataURI: string,
+  signer: SignerWithAddress
+) {
+  const tx = await pluginRepo
+    .connect(signer)
+    .createVersion(
+      release,
+      setup,
+      ethers.utils.hexlify(ethers.utils.toUtf8Bytes(buildMetadataURI)),
+      ethers.utils.hexlify(ethers.utils.toUtf8Bytes(releaseMetadataURI))
+    );
+  await tx.wait();
+}
 
 /**
  * Publishes the plugin setup in the plugin repo as a new version as specified in the `./plugin-settings.ts` file.
@@ -31,9 +53,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const {deployments} = hre;
   const [deployer] = await hre.ethers.getSigners();
 
-  // metadata will be empty if running locally
-  let releaseMetadataURI = '';
-  let buildMetadataURI = '';
+  let releaseMetadataURI = '0x';
+  let buildMetadataURI = '0x';
 
   if (!isLocal(hre)) {
     // Upload the metadata to IPFS
@@ -71,18 +92,25 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   // Check build number
   const latestBuild = (await pluginRepo.buildCount(VERSION.release)).toNumber();
-  if (VERSION.build < latestBuild) {
-    throw Error(
-      `Publishing with build number ${VERSION.build} is not possible. The latest build is ${latestBuild}. Aborting publication...`
-    );
-  }
-  if (VERSION.build > latestBuild + 1) {
-    throw Error(
-      `Publishing with build number ${VERSION.build} is not possible. 
-        The latest build is ${latestBuild} and the next release you can publish is release number ${
-        latestBuild + 1
-      }. Aborting publication...`
-    );
+
+  if (latestBuild == 0 && VERSION.build > 1) {
+    // it means there's no build yet on the repo on the specific VERSION.release
+    // and build version in the plugin settings is > 1, meaning that
+    // it must push placeholder contracts and as the last one, push the actual plugin setup.
+  } else {
+    if (VERSION.build < latestBuild) {
+      throw Error(
+        `Publishing with build number ${VERSION.build} is not possible. The latest build is ${latestBuild}. Aborting publication...`
+      );
+    }
+    if (VERSION.build > latestBuild + 1) {
+      throw Error(
+        `Publishing with build number ${VERSION.build} is not possible. 
+          The latest build is ${latestBuild} and the next release you can publish is release number ${
+          latestBuild + 1
+        }. Aborting publication...`
+      );
+    }
   }
 
   if (setup == undefined || setup?.receipt == undefined) {
@@ -112,17 +140,34 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       []
     )
   ) {
-    // Create the new version
-    const tx = await pluginRepo
-      .connect(signer)
-      .createVersion(
-        VERSION.release,
-        setup.address,
-        ethers.utils.hexlify(ethers.utils.toUtf8Bytes(buildMetadataURI)),
-        ethers.utils.hexlify(ethers.utils.toUtf8Bytes(releaseMetadataURI))
+    const placeholderSetup = getLatestContractAddress('PlaceholderSetup', hre);
+    if (placeholderSetup == '') {
+      throw new Error(
+        'Aborting. Placeholder setup not present in this network'
       );
+    }
+    if (latestBuild == 0 && VERSION.build > 1) {
+      for (let i = 0; i < VERSION.build - 1; i++) {
+        console.log('Publishing placeholder', i + 1);
+        await createVersion(
+          pluginRepo,
+          VERSION.release,
+          placeholderSetup,
+          `{}`,
+          'placeholder-setup-build',
+          signer
+        );
+      }
+    }
 
-    await tx.wait();
+    await createVersion(
+      pluginRepo,
+      VERSION.release,
+      setup.address,
+      releaseMetadataURI,
+      buildMetadataURI,
+      signer
+    );
 
     const version = await pluginRepo['getLatestVersion(uint8)'](
       VERSION.release
