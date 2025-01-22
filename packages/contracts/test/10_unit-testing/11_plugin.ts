@@ -31,7 +31,7 @@ import {
   getInterfaceId,
   DAO_PERMISSIONS,
 } from '@aragon/osx-commons-sdk';
-import {DAO, DAOStructs, DAOEvents} from '@aragon/osx-ethers';
+import {DAO, DAOEvents, DAOStructs} from '@aragon/osx-ethers';
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers';
 import {expect} from 'chai';
 import {BigNumber} from 'ethers';
