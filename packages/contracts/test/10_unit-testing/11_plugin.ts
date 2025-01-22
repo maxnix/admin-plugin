@@ -10,7 +10,6 @@ import {
   IProposal__factory,
   IProtocolVersion__factory,
 } from '../../typechain';
-import {ActionStruct} from '../../typechain/@aragon/osx-commons-contracts/src/executors/IExecutor';
 import {ProposalCreatedEvent} from '../../typechain/src/Admin';
 import {isZkSync} from '../../utils/zkSync';
 import {
@@ -32,7 +31,7 @@ import {
   getInterfaceId,
   DAO_PERMISSIONS,
 } from '@aragon/osx-commons-sdk';
-import {DAO, DAOEvents} from '@aragon/osx-ethers';
+import {DAO, DAOStructs, DAOEvents} from '@aragon/osx-ethers';
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers';
 import {expect} from 'chai';
 import {BigNumber} from 'ethers';
@@ -43,7 +42,7 @@ let chainId: number;
 
 async function createProposalId(
   pluginAddress: string,
-  actions: ActionStruct[],
+  actions: DAOStructs.ActionStruct[],
   metadata: string
 ): Promise<BigNumber> {
   const blockNumber = (await ethers.provider.getBlock('latest')).number;
@@ -496,7 +495,7 @@ type FixtureResult = {
   initializedPlugin: Admin;
   uninitializedPlugin: Admin;
   dao: DAO;
-  dummyActions: ActionStruct[];
+  dummyActions: DAOStructs.ActionStruct[];
   dummyMetadata: string;
   targetConfig: TargetConfig;
 };
@@ -534,7 +533,7 @@ async function fixture(): Promise<FixtureResult> {
     await initializedPlugin.initialize(dao.address, targetConfig);
   }
 
-  const dummyActions: ActionStruct[] = [
+  const dummyActions: DAOStructs.ActionStruct[] = [
     {
       to: deployer.address,
       data: '0x1234',
