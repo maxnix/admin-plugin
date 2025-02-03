@@ -19,8 +19,6 @@
 :xref-AdminSetup-EXECUTE_PERMISSION_ID-bytes32: xref:Admin.adoc#AdminSetup-EXECUTE_PERMISSION_ID-bytes32
 = Admin API
 
-IMPORTANT: The contracts of build 2(use build 1) are currently being audited, DO NOT USE IN PRODUCTION.
-
 == Core
 
 :ADMIN_INTERFACE_ID: pass:normal[xref:#Admin-ADMIN_INTERFACE_ID-bytes4[`++ADMIN_INTERFACE_ID++`]]
@@ -38,7 +36,7 @@ IMPORTANT: The contracts of build 2(use build 1) are currently being audited, DO
 
 [.contract]
 [[Admin]]
-=== `++Admin++` link:https://github.com/aragon/blob/v1.0/src/Admin.sol[{github-icon},role=heading-link]
+=== `++Admin++` link:https://github.com/aragon/admin-plugin/blob/v1.3.0/packages/contracts/src/Admin.sol[{github-icon},role=heading-link]
 
 v1.2 (Release 1, Build 2)
 
@@ -338,7 +336,7 @@ The [ERC-165](https://eips.ethereum.org/EIPS/eip-165) interface ID of the contra
 
 [.contract]
 [[AdminSetup]]
-=== `++AdminSetup++` link:https://github.com/aragon/blob/v1.0/src/AdminSetup.sol[{github-icon},role=heading-link]
+=== `++AdminSetup++` link:https://github.com/aragon/admin-plugin/blob/v1.3.0/packages/contracts/src/AdminSetup.sol[{github-icon},role=heading-link]
 
 v1.2 (Release 1, Build 2)
 

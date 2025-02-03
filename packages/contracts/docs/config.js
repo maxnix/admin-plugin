@@ -1,13 +1,13 @@
 const path = require('path');
 const fs = require('fs');
 
-// const { version, repository } = require('../package.json');
+const {version, repository} = require('../package.json');
 
-// const helpers = require(path.resolve(__dirname, './templates/helpers'));
+const helpers = require(path.resolve(__dirname, './templates/helpers'));
 
-// // overwrite the functions.
-// helpers.version = () => `${version}/packages/contracts`;
-// helpers.githubURI = () => repository.url;
+// overwrite the functions.
+helpers.version = () => `${version}/packages/contracts`;
+helpers.githubURI = () => repository.url;
 
 /** @type import('solidity-docgen/dist/config').UserConfig */
 module.exports = {
