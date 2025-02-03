@@ -141,7 +141,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     )
   ) {
     const placeholderSetup = getLatestContractAddress('PlaceholderSetup', hre);
-    if (placeholderSetup == '') {
+    if (placeholderSetup == '' && !isLocal(hre)) {
       throw new Error(
         'Aborting. Placeholder setup not present in this network'
       );
