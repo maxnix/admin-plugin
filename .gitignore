@@ -16,6 +16,8 @@ packages/subgraph/imported
 packages/subgraph/generated
 packages/subgraph/tests/.bin
 
+packages/contracts/.upgradable
+
 # files
 *.env
 *.log
@@ -30,3 +32,8 @@ packages/subgraph/deploy-output.txt
 packages/subgraph/subgraph.yaml
 packages/subgraph/tests/.latest.json
 packages/subgraph/tests/helpers/extended-schema.ts
+
+artifacts-zk
+cache-zk
+deployments-zk
+deployments
