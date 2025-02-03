@@ -19,8 +19,6 @@
 :xref-AdminSetup-EXECUTE_PERMISSION_ID-bytes32: xref:Admin.adoc#AdminSetup-EXECUTE_PERMISSION_ID-bytes32
 = Admin API
 
-IMPORTANT: The contracts of build 2(use build 1) are currently being audited, DO NOT USE IN PRODUCTION.
-
 == Core
 
 :ADMIN_INTERFACE_ID: pass:normal[xref:#Admin-ADMIN_INTERFACE_ID-bytes4[`++ADMIN_INTERFACE_ID++`]]
