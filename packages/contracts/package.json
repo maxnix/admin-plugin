@@ -2,7 +2,7 @@
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "build": "cross-env TS_NODE_TRANSPILE_ONLY=true hardhat compile",
-    "build:zksync": "hardhat build-contracts --config hardhat-zksync.config.ts && yarn typechain",
+    "build:zksync": "hardhat compile --config hardhat-zksync.config.ts && yarn typechain",
     "coverage": "hardhat coverage --solcoverjs ./.solcover.js --temp artifacts --testfiles \"test/**/*.ts\" && yarn typechain",
     "deploy": "hardhat deploy",
     "deploy:zksync": "hardhat deploy-contracts --config hardhat-zksync.config.ts",
@@ -10,7 +10,7 @@
     "lint:sol": "cd ../../ && yarn run lint:contracts:sol",
     "lint:ts": "cd ../../ && yarn run lint:contracts:ts",
     "test": "hardhat test",
-    "test:zksync": "hardhat test-contracts --config hardhat-zksync.config.ts",
+    "test:zksync": "hardhat test --config hardhat-zksync.config.ts",
     "docgen": "hardhat docgen",
     "typechain": "cross-env TS_NODE_TRANSPILE_ONLY=true hardhat typechain",
     "clean": "rimraf ./artifacts ./cache ./coverage ./typechain ./coverage.json && yarn typechain",
