@@ -1,0 +1,9 @@
+= Admin API
+
+IMPORTANT: The contracts of build 2(use build 1) are currently being audited, DO NOT USE IN PRODUCTION.
+
+== Core
+
+{{Admin}}
+
+{{AdminSetup}}
