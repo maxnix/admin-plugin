@@ -10,14 +10,6 @@ dist
 node_modules
 typechain
 
-packages/contracts/node_modules
-
-packages/subgraph/imported
-packages/subgraph/generated
-packages/subgraph/tests/.bin
-
-packages/contracts/.upgradable
-
 # files
 *.env
 *.log
@@ -27,11 +19,6 @@ coverage.json
 
 packages/contracts/createVersionProposalData*.json
 packages/contracts/upgradeRepoProposalData*.json
-
-packages/subgraph/deploy-output.txt
-packages/subgraph/subgraph.yaml
-packages/subgraph/tests/.latest.json
-packages/subgraph/tests/helpers/extended-schema.ts
 
 artifacts-zk
 cache-zk
