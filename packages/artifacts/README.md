@@ -1,6 +1,6 @@
 # Admin Plugin artifacts
 
-This package contains the ABIs of the OSx Admin plugin, as well as the address of the plugin repository on each supported network. 
+This package contains the ABIs of the OSx Admin plugin, as well as the address of the plugin repository on each supported network.
 
 ## Installation
 
@@ -39,6 +39,14 @@ The `build` script will:
 3. Compile the contracts using Hardhat.
 4. Generate their ABI.
 5. Extract their ABI and embed it into on `src/abi.ts`.
+
+### Syncing the deployment addresses
+
+Clone [OSx Commons](https://github.com/aragon/osx-commons) in a folder next to this repo.
+
+```sh
+yarn sync-addresses
+```
 
 ## Documentation
 
