@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v1.2.1
 
+- Added Optimism
+
+## v1.2.1
+
 - Added the plugin repository on Celo
 
 ## v1.2.0
