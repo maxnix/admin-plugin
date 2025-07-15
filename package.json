@@ -1,5 +1,6 @@
 {
   "name": "@aragon/admin-plugin",
+  "version": "1.2.0",
   "description": "A template to fork from when developing an Aragon OSx plugin",
   "license": "AGPL-3.0-or-later",
   "author": {
